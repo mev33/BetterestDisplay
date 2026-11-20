@@ -2,14 +2,13 @@ import AppKit
 import OSLog
 import SwiftUI
 
-/// Advanced Settings > About: what Crisp is, its version, an update check, a debug report
-/// for bug reports, and the donation links (the panel's Support Crisp row has the same).
+/// Advanced Settings > About: what Crisp is, its version and a debug report for bug
+/// reports. This offline fork has no update check and no web links: nothing here can
+/// open a connection (scripts/check-no-network.sh).
 struct AdvancedAboutTab: View {
     @EnvironmentObject var displayManager: DisplayManager
     @State private var copying = false
     @State private var copied = false
-
-    private static let repo = "https://github.com/didriksg/Crisp"
 
     var body: some View {
         VStack(spacing: 0) {
@@ -20,59 +19,35 @@ struct AdvancedAboutTab: View {
             Text(verbatim: "Crisp")
                 .font(.title.bold())
                 .padding(.top, 8)
-            Text("Version \(UpdateService.shared.currentVersion)")
+            Text("Version \(AppVersion.current)")
                 .foregroundStyle(.secondary)
                 .padding(.top, 2)
             VStack(spacing: 2) {
                 Text("Every display control macOS hides, in one menu bar panel.")
                 Text("Free and open source.")
+                Text("Offline build: never connects to the network.")
             }
             .padding(.top, 14)
 
-            HStack(spacing: 8) {
-                Button("Check for Updates…") { UpdateService.shared.installUpdate() }
-                Button(copied ? "Copied" : copying ? "Copying…" : "Copy Debug Info") { copyDebugInfo() }
-                    .disabled(copying)
-            }
-            .padding(.top, 18)
+            Button(copied ? "Copied" : copying ? "Copying…" : "Copy Debug Info") { copyDebugInfo() }
+                .disabled(copying)
+                .padding(.top, 18)
             Text("Copies versions, displays and the last 30 minutes of Crisp's log to the clipboard, for a bug report.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .padding(.top, 6)
 
-            Text("Crisp is free. Donations keep it signed and notarized:")
-                .font(.callout)
-                .foregroundStyle(.secondary)
-                .padding(.top, 22)
-            HStack(spacing: 6) {
-                if SupportRow.prefersChinese {
-                    Link(SupportRow.afdianTitle, destination: URL(string: SupportRow.afdian)!).handCursor()
-                    Text(verbatim: "·").foregroundStyle(.secondary)
-                }
-                Link(destination: URL(string: SupportRow.kofi)!) { Text(verbatim: "Ko-fi") }.handCursor()
-                Text(verbatim: "·").foregroundStyle(.secondary)
-                Link(destination: URL(string: SupportRow.github)!) { Text(verbatim: "GitHub Sponsors") }.handCursor()
-                if !SupportRow.prefersChinese {
-                    Text(verbatim: "·").foregroundStyle(.secondary)
-                    Link(SupportRow.afdianTitle, destination: URL(string: SupportRow.afdian)!).handCursor()
-                }
-            }
-            .padding(.top, 4)
-
+            // Plain text, not links: the license and credits ship in the source tree
+            // (LICENSE, ACKNOWLEDGMENTS.md), and this build opens no web pages.
             HStack(spacing: 4) {
                 Text(verbatim: "© 2026 Didrik Galteland ·")
-                Link("MIT License", destination: URL(string: Self.repo + "/blob/main/LICENSE")!).handCursor()
+                Text("MIT License")
                 Text(verbatim: "·")
-                Link("Acknowledgments", destination: URL(string: Self.repo + "/blob/main/ACKNOWLEDGMENTS.md")!).handCursor()
+                Text("Acknowledgments")
             }
             .font(.caption)
             .foregroundStyle(.secondary)
-            .tint(.secondary)
             .padding(.top, 26)
-            Link(destination: URL(string: Self.repo)!) { Text(verbatim: "github.com/didriksg/Crisp") }
-                .handCursor()
-                .font(.caption)
-                .padding(.top, 4)
         }
         .multilineTextAlignment(.center)
         .frame(maxWidth: .infinity)
@@ -86,7 +61,7 @@ struct AdvancedAboutTab: View {
         Task {
             // Reading the log takes about 2 s (measured), so it runs off the main thread.
             let log = await Task.detached { DebugInfo.recentLog() }.value
-            let text = DebugReport.text(crisp: UpdateService.shared.currentVersion,
+            let text = DebugReport.text(crisp: AppVersion.current,
                                         macOS: ProcessInfo.processInfo.operatingSystemVersionString,
                                         mac: DebugInfo.macModel(), displays: displays,
                                         log: log.lines, allRuns: log.allRuns)
@@ -141,14 +116,5 @@ private enum DebugInfo {
             "\(format.string(from: $0.date)) [\($0.processIdentifier)] \($0.category): \($0.composedMessage)"
         }
         return (lines, local != nil)
-    }
-}
-
-private extension View {
-    /// The pointing hand over a link, as the panel's link rows show it.
-    func handCursor() -> some View {
-        onHover { hovering in
-            if hovering { NSCursor.pointingHand.push() } else { NSCursor.pop() }
-        }
     }
 }

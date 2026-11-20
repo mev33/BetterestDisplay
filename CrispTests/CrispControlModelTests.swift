@@ -125,17 +125,11 @@ final class CrispControlModelTests: XCTestCase {
         }
     }
 
-    func testParserReadsTheSkillCommands() {
-        XCTAssertEqual(CrispControlCLIModel.parse(arguments: ["skill", "show"]), .showSkill)
-        XCTAssertEqual(CrispControlCLIModel.parse(arguments: ["skill", "install", "claude"]), .installSkill(agent: "claude"))
-        XCTAssertEqual(CrispControlCLIModel.parse(arguments: ["skill", "install", "codex"]), .installSkill(agent: "codex"))
-        // The agent is required and must be one crispctl knows the skills folder of.
-        let usage = CrispControlCLIModel.ParseResult.failure("usage: crispctl skill show or crispctl skill install claude|codex")
-        for arguments in [["skill"], ["skill", "--help"], ["skill", "install"], ["skill", "install", "cursor"],
-                          ["skill", "install", "claude", "codex"]] {
-            XCTAssertEqual(CrispControlCLIModel.parse(arguments: arguments), usage, "\(arguments)")
-        }
-        XCTAssertTrue(CrispControlCLIModel.help.contains("skill install"))
+    /// This fork has no agent-skill installer (it wrote into other apps' folders).
+    func testSkillIsNoLongerACommand() {
+        XCTAssertEqual(CrispControlCLIModel.parse(arguments: ["skill", "install", "claude"]),
+                       .failure("unknown command 'skill'; run 'crispctl help' for the commands"))
+        XCTAssertFalse(CrispControlCLIModel.help.contains("skill"))
     }
 
     func testParserNamesTheUsageAWrongInvocationWasClosestTo() {

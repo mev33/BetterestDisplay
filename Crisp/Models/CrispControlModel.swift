@@ -86,6 +86,28 @@ struct CrispControlRequest: Codable, Equatable {
         case setVirtualDisplay
         case getRotation
         case setRotation
+
+        /// Reads only. The one kind of request a read-only command line still serves.
+        var isReadOnly: Bool {
+            switch self {
+            case .list, .getBrightness, .getBrightnessBoost, .getHDR, .listPresets, .getImage,
+                 .listInputs, .listVirtualDisplays, .getRotation:
+                return true
+            default:
+                return false
+            }
+        }
+
+        /// Can take a screen away: a disconnect, an input switch (the Mac loses that
+        /// display), or a preset that turns displays off or switches inputs. Over the
+        /// socket these need `confirmed`, which crispctl sets for --confirm, so a script
+        /// or another process running as you cannot blank a screen by accident.
+        var needsConfirmation: Bool {
+            switch self {
+            case .disconnectDisplay, .toggleDisplay, .setInput, .applyPreset: return true
+            default: return false
+            }
+        }
     }
 
     let command: Command
@@ -103,6 +125,8 @@ struct CrispControlRequest: Codable, Equatable {
     let input: String?
     /// `setRotation`: 0, 90, 180 or 270 degrees.
     let rotation: Int?
+    /// crispctl's --confirm: required over the socket for commands that need confirmation.
+    let confirmed: Bool?
     init(
         command: Command,
         display: UInt32? = nil,
@@ -112,7 +136,8 @@ struct CrispControlRequest: Codable, Equatable {
         setting: CrispControlImageSetting? = nil,
         value: Double? = nil,
         input: String? = nil,
-        rotation: Int? = nil
+        rotation: Int? = nil,
+        confirmed: Bool? = nil
     ) {
         self.command = command
         self.display = display
@@ -123,6 +148,16 @@ struct CrispControlRequest: Codable, Equatable {
         self.value = value
         self.input = input
         self.rotation = rotation
+        self.confirmed = confirmed
+    }
+
+    /// The same request with --confirm given.
+    func confirming() -> CrispControlRequest {
+        CrispControlRequest(
+            command: command, display: display, brightness: brightness, selector: selector,
+            enabled: enabled, setting: setting, value: value, input: input, rotation: rotation,
+            confirmed: true
+        )
     }
 }
 /// A display's rotation in degrees: 0, 90, 180 or 270 (#258).
@@ -411,6 +446,25 @@ enum CrispControlModel {
     }
     static let hdrUncertainRecovery = "outcome is uncertain; do not retry automatically—run "
         + "'crispctl hdr get <display>' before deciding whether to retry"
+
+    /// The socket's own checks, ahead of `handle`: a read-only command line serves reads
+    /// only, and a command that can take a screen away needs --confirm. Nil lets the
+    /// request through. Shortcuts actions run in-process and skip this: the person
+    /// built that shortcut in Shortcuts, which is the confirmation.
+    static func socketRefusal(for data: Data, readOnly: Bool) -> CrispControlResponse? {
+        // An undecodable request gets handle()'s own "invalid request" reply.
+        guard let request = try? JSONDecoder().decode(CrispControlRequest.self, from: data) else { return nil }
+        if readOnly, !request.command.isReadOnly {
+            return .failure(readOnlyRefusal)
+        }
+        if request.command.needsConfirmation, request.confirmed != true {
+            return .failure(confirmationRefusal)
+        }
+        return nil
+    }
+    static let readOnlyRefusal = "the command line is read-only (Advanced Settings > Automation); "
+        + "only list and get commands are allowed"
+    static let confirmationRefusal = "this command can take a display away; run it again with --confirm"
 
     static func handle(
         _ data: Data,
@@ -902,9 +956,7 @@ enum CrispControlCLIModel {
     ]
     static let otherRows: [(usage: String, arguments: String, summary: String)] = [
         ("help", "", "Show this help (also -h, --help)"),
-        ("version", "", "Show the Crisp version this tool ships with (also --version)"),
-        ("skill show", "", "Print the agent skill for crispctl"),
-        ("skill install", "claude|codex", "Install that skill for Claude Code or Codex")
+        ("version", "", "Show the Crisp version this tool ships with (also --version)")
     ]
 
     static let intro = """
@@ -921,6 +973,8 @@ enum CrispControlCLIModel {
         add --json to any command: one JSON object per call, {"ok":true,...} or
         {"ok":false,"error":"..."}, which is what the field names in each command's help
         describe.
+        Commands that can take a display away (display disconnect, display toggle,
+        display input set, preset apply) need --confirm, anywhere among the arguments.
         Exit codes: 0 ok, 1 Crisp unreachable, 2 bad arguments, 3 Crisp refused.
         """
 
@@ -982,8 +1036,6 @@ enum CrispControlCLIModel {
         case request(CrispControlRequest)
         case help(HelpTopic)
         case version
-        case showSkill
-        case installSkill(agent: String)
         case failure(String)
     }
     enum ResponseResult: Equatable { case success, serverFailure, invalid }
@@ -1006,9 +1058,11 @@ enum CrispControlCLIModel {
         }
     }
     static func parse(arguments: [String]) -> ParseResult {
+        // --confirm may stand anywhere, like --json (which crispctl strips before this).
+        let confirmed = arguments.contains("--confirm")
+        let arguments = arguments.filter { $0 != "--confirm" }
         if let help = helpRequest(arguments) { return help }
-        if let skill = skillRequest(arguments) { return skill }
-        if let request = matchedRequest(arguments) { return .request(request) }
+        if let request = matchedRequest(arguments) { return .request(confirmed ? request.confirming() : request) }
         return .failure(usageMessage(for: arguments))
     }
     private static func helpRequest(_ arguments: [String]) -> ParseResult? {
@@ -1023,16 +1077,6 @@ enum CrispControlCLIModel {
             .max { $0.words.count < $1.words.count }
         return .help(opened.map(HelpTopic.command) ?? .group(group))
     }
-    private static func skillRequest(_ arguments: [String]) -> ParseResult? {
-        guard arguments.first == "skill" else { return nil }
-        if arguments == ["skill", "show"] { return .showSkill }
-        if arguments.count == 3, arguments[1] == "install", skillFolders[arguments[2]] != nil {
-            return .installSkill(agent: arguments[2])
-        }
-        return .failure("usage: crispctl skill show or crispctl skill install claude|codex")
-    }
-    /// Where each agent reads user skills, relative to the home folder.
-    static let skillFolders = ["claude": ".claude/skills", "codex": ".agents/skills"]
     /// What a wrong invocation gets: the usage of the command it was closest to, or,
     /// for a word that is no command at all, where the commands are listed.
     static func usageMessage(for arguments: [String]) -> String {

@@ -445,6 +445,22 @@
         }
       }
     },
+    "Command Line Is Read-Only" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "命令行只读"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "命令列唯讀"
+          }
+        }
+      }
+    },
     "Copied" : {
       "localizations" : {
         "zh-Hans" : {
@@ -637,6 +653,22 @@
         }
       }
     },
+    "For brightness keys with the lid closed, or sent as F14 and F15. Crisp acts on those keys only and stores nothing." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用于合盖时的亮度键，或以 F14 和 F15 发送的亮度键。Crisp 只响应这些按键，不存储任何内容。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用於闔上螢幕時的亮度鍵，或以 F14 和 F15 傳送的亮度鍵。Crisp 只回應這些按鍵，不儲存任何內容。"
+          }
+        }
+      }
+    },
     "Free and open source." : {
       "localizations" : {
         "zh-Hans" : {
@@ -665,6 +697,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "一般"
+          }
+        }
+      }
+    },
+    "HiDPI and smooth scaling go back to how they were before Crisp changed them. macOS asks for your administrator password." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HiDPI 和平滑缩放将恢复到 Crisp 更改之前的状态。macOS 会要求输入管理员密码。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HiDPI 和平滑縮放將還原到 Crisp 更改之前的狀態。macOS 會要求輸入管理員密碼。"
           }
         }
       }
@@ -745,6 +793,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "鍵盤"
+          }
+        }
+      }
+    },
+    "Links crispctl into ~/.local/bin" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "将 crispctl 链接到 ~/.local/bin"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "將 crispctl 連結到 ~/.local/bin"
           }
         }
       }
@@ -861,6 +925,38 @@
         }
       }
     },
+    "Offline build: never connects to the network." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "离线版本：从不连接网络。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "離線版本：從不連接網路。"
+          }
+        }
+      }
+    },
+    "Puts back the %lld files in /Library/Displays that Crisp changed, as they were before" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "将 Crisp 更改过的 %lld 个 /Library/Displays 文件恢复原样"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "將 Crisp 更改過的 %lld 個 /Library/Displays 檔案還原成原樣"
+          }
+        }
+      }
+    },
     "Reading the inputs from the monitor…" : {
       "localizations" : {
         "zh-Hans" : {
@@ -873,6 +969,70 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "正在從顯示器讀取輸入來源…"
+          }
+        }
+      }
+    },
+    "Restore" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "恢复"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "還原"
+          }
+        }
+      }
+    },
+    "Restore Display Override Files" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "恢复显示器覆盖文件"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "還原顯示器覆寫檔案"
+          }
+        }
+      }
+    },
+    "Restore Display Override Files?" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要恢复显示器覆盖文件吗？"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要還原顯示器覆寫檔案嗎？"
+          }
+        }
+      }
+    },
+    "Restore…" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "恢复…"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "還原…"
           }
         }
       }
@@ -969,6 +1129,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "將顯示器切換到其他輸入來源（例如 HDMI 1 或 0x11），與在選單中選擇它相同。「重新連接顯示器」會將它切換回這台 Mac。"
+          }
+        }
+      }
+    },
+    "System Files" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "系统文件"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "系統檔案"
           }
         }
       }
@@ -1097,6 +1273,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "音量鍵"
+          }
+        }
+      }
+    },
+    "Watch Every Key Press" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "监视每次按键"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "監視每次按鍵"
+          }
+        }
+      }
+    },
+    "crispctl and scripts can list and read, but not change anything" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "crispctl 和脚本只能列出和读取，不能更改任何内容"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "crispctl 和腳本只能列出和讀取，不能更改任何內容"
           }
         }
       }

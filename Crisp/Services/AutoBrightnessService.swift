@@ -79,6 +79,8 @@ final class AutoBrightnessService: ObservableObject, @unchecked Sendable {
     /// Last manual external-brightness adjustment; absolute mode's 30s grace
     /// (applyBrightness) keeps auto-sync from fighting the user's hand.
     private var lastExternalManualAdjust: Date?
+    /// The last automatic write to each DDC monitor (DDCWriteBudget).
+    private var lastAutoDDCWrite: [CGDirectDisplayID: Date] = [:]
 
     /// Set to true after the first poll attempt completes (success or failure).
     /// Used by the UI to distinguish "not polled yet" from "no builtin display found".
@@ -248,6 +250,9 @@ final class AutoBrightnessService: ObservableObject, @unchecked Sendable {
         let builtinLinear = builtinDisplay.flatMap {
             BrightnessService.shared.linearBrightness(for: $0.displayID)
         }
+        // A DDC monitor held back by the write budget keeps lastAppliedBrightness
+        // where it was, so the next poll aims it again instead of leaving it behind.
+        var deferred = false
         for display in snapshot {
             guard !display.isBuiltin else { continue }
 
@@ -279,15 +284,28 @@ final class AutoBrightnessService: ObservableObject, @unchecked Sendable {
             }
 
             let current = display.brightness
-            if abs(current - target) >= 2.0 {
-                // Short glide (~0.4s, the DDC write floor): the built-in
-                // subscription re-aims continuously, so a longer duration
-                // makes the external trail it (docs/brightness-notes.md).
+            if BrightnessService.shared.brightnessBackend(for: display) == .ddc {
+                // One write per step, in coarse, spaced steps: these land in the
+                // monitor's settings memory (DDCWriteBudget).
+                let now = Date()
+                guard force || DDCWriteBudget.allowsAutoWrite(
+                    from: current, to: target, lastWrite: lastAutoDDCWrite[display.displayID], now: now
+                ) else {
+                    if abs(current - target) >= DDCWriteBudget.minimumAutoStep { deferred = true }
+                    continue
+                }
+                lastAutoDDCWrite[display.displayID] = now
+                BrightnessService.shared.setBrightnessSmooth(
+                    target, for: display, isAutoAdjust: true, duration: 0.1)
+            } else if abs(current - target) >= 2.0 {
+                // Short glide (~0.4s): the built-in subscription re-aims continuously,
+                // so a longer duration makes the external trail it
+                // (docs/brightness-notes.md). No DDC here, so no write budget.
                 BrightnessService.shared.setBrightnessSmooth(
                     target, for: display, isAutoAdjust: true, duration: 0.4)
             }
         }
-        lastAppliedBrightness = builtin
+        if !deferred { lastAppliedBrightness = builtin }
     }
 
     // MARK: - Persistence

@@ -1,4 +1,4 @@
-# Sourced by dev.sh and release.sh. Shortcuts finds Crisp's actions
+# Sourced by dev.sh and scripts/build-app.sh (both export CRISP_BUNDLE_ID). Shortcuts finds Crisp's actions
 # (Crisp/App/ShortcutsActions.swift) through Contents/Resources/Metadata.appintents,
 # which an Xcode build writes with appintentsmetadataprocessor. Crisp builds with
 # plain swiftc, so these helpers do the same two steps: swiftc emits the const values
@@ -47,7 +47,7 @@ appintents_metadata() {
         --toolchain-dir "$AI_DEV/Toolchains/XcodeDefault.xctoolchain" --module-name main \
         --sdk-root "$(DEVELOPER_DIR="$AI_DEV" xcrun --show-sdk-path)" \
         --xcode-version "$(DEVELOPER_DIR="$AI_DEV" xcodebuild -version | awk '/Build version/ {print $3}')" \
-        --platform-family macOS --deployment-target 14.0 --bundle-identifier com.crisp.app \
+        --platform-family macOS --deployment-target 14.0 --bundle-identifier "${CRISP_BUNDLE_ID:?set CRISP_BUNDLE_ID (read from project.yml)}" \
         --output "$resources" --binary-file "$binary" "${args[@]}" \
         --source-file-list "$AI_WORK/sources.list" \
         --metadata-file-list "$AI_WORK/empty.list" --static-metadata-file-list "$AI_WORK/empty.list" \

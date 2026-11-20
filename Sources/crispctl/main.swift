@@ -98,7 +98,7 @@ private func fail(_ message: String, code: Int32) -> Never {
 }
 /// The version of the Crisp this tool ships inside: crispctl lives at
 /// Crisp.app/Contents/MacOS/crispctl, so the app's Info.plist is two levels up from
-/// the executable once the /usr/local/bin link is resolved.
+/// the executable once the ~/.local/bin link is resolved.
 private func bundledVersion() -> String {
     guard let executable = Bundle.main.executableURL?.resolvingSymlinksInPath() else { return "unknown" }
     let plist = executable.deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("Info.plist")
@@ -106,21 +106,6 @@ private func bundledVersion() -> String {
         return "unknown (not inside Crisp.app)"
     }
     return version
-}
-/// Writes the skill where the agent reads it and prints the path. Overwrites an
-/// older copy, so running it again after an update refreshes it.
-private func installSkill(for agent: String) -> Never {
-    let file = FileManager.default.homeDirectoryForCurrentUser
-        .appendingPathComponent(CrispControlCLIModel.skillFolders[agent] ?? "")
-        .appendingPathComponent("crispctl/SKILL.md")
-    do {
-        try FileManager.default.createDirectory(at: file.deletingLastPathComponent(), withIntermediateDirectories: true)
-        try Data(CrispControlSkill.text.utf8).write(to: file, options: .atomic)
-    } catch {
-        fail("could not write \(file.path): \(error.localizedDescription)", code: 1)
-    }
-    print("Installed \(file.path)")
-    Darwin.exit(EXIT_SUCCESS)
 }
 let request: CrispControlRequest
 switch CrispControlCLIModel.parse(arguments: CommandLine.arguments.dropFirst().filter { $0 != "--json" }) {
@@ -135,11 +120,6 @@ case let .help(topic):
 case .version:
     print("crispctl \(bundledVersion())")
     Darwin.exit(EXIT_SUCCESS)
-case .showSkill:
-    print(CrispControlSkill.text, terminator: "")
-    Darwin.exit(EXIT_SUCCESS)
-case let .installSkill(agent):
-    installSkill(for: agent)
 case let .failure(message): fail(message, code: 2)
 }
 do {

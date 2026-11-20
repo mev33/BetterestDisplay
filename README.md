@@ -1,3 +1,12 @@
+> **This is a personal, offline fork of [Crisp](https://github.com/didriksg/Crisp) (MIT).**
+> It never connects to the network: the Sparkle updater and every web link are removed,
+> and `scripts/check-no-network.sh` enforces it in every build. It has its own bundle ID
+> (`local.crisp.offline`) and settings folder, so it doesn't clash with an upstream install.
+> Build it with `make app` ([docs/BUILDING.md](docs/BUILDING.md)). What it may do with
+> administrator rights and monitor hardware, and how to undo it, is in
+> [docs/SAFETY.md](docs/SAFETY.md). The download and install instructions below are
+> upstream's and don't apply to this fork.
+
 <div align="center">
 
 <img src="docs/icon.png" width="128" alt="Crisp icon">

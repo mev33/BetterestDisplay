@@ -12,6 +12,10 @@ struct AdvancedGeneralTab: View {
     @ObservedObject private var autoBrightness = AutoBrightnessService.shared
     @EnvironmentObject var displayManager: DisplayManager
     @State private var cliInstalled = CrispctlInstaller.isInstalled
+    @AppStorage(CrispControlServer.readOnlyDefaultsKey) private var cliReadOnly = false
+    @ObservedObject private var systemFiles = SystemFileManifest.shared
+    @State private var confirmRestore = false
+    @State private var restoreFailures: [String] = []
 
     private var physicalDisplays: [DisplayInfo] {
         displayManager.displays.filter { !VirtualDisplayService.shared.isVirtualDisplay($0.displayID) }
@@ -127,9 +131,9 @@ struct AdvancedGeneralTab: View {
                                    isOn: $settings.showKeepAwakeInMenuBar)
                 }
             }
-            if CrispctlInstaller.isAvailable {
-                Section("Automation") {
-                    CenteredToggle(title: "Command Line Tool", detail: Text("Links crispctl into /usr/local/bin"), isOn: Binding(
+            Section("Automation") {
+                if CrispctlInstaller.isAvailable {
+                    CenteredToggle(title: "Command Line Tool", detail: Text("Links crispctl into ~/.local/bin"), isOn: Binding(
                         get: { cliInstalled },
                         set: { newValue in
                             if newValue { CrispctlInstaller.install() } else { CrispctlInstaller.uninstall() }
@@ -137,10 +141,33 @@ struct AdvancedGeneralTab: View {
                         }
                     ))
                 }
+                // Applies to every local client of the control socket, linked or not.
+                CenteredToggle(title: "Command Line Is Read-Only",
+                               detail: Text("crispctl and scripts can list and read, but not change anything"),
+                               isOn: $cliReadOnly)
+            }
+            // Every file Crisp changed as root, put back as it was (SystemFileManifest).
+            if !systemFiles.records.isEmpty {
+                Section("System Files") {
+                    CenteredRow(title: "Restore Display Override Files",
+                                detail: Text("Puts back the \(systemFiles.records.count) files in /Library/Displays that Crisp changed, as they were before")) {
+                        Button("Restore…") { confirmRestore = true }
+                    }
+                    ForEach(restoreFailures, id: \.self) { failure in
+                        Text(verbatim: failure).font(.caption).foregroundStyle(.red)
+                    }
+                }
             }
         }
         .formStyle(.grouped)
         .scrollDisabled(true)  // the window's scroll view scrolls; this one took the wheel
+        .alert("Restore Display Override Files?", isPresented: $confirmRestore) {
+            Button("Restore", role: .destructive) { restoreFailures = systemFiles.restoreAll() }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            // swiftlint:disable:next line_length - localized literal, splitting would change its catalog key
+            Text("HiDPI and smooth scaling go back to how they were before Crisp changed them. macOS asks for your administrator password.")
+        }
         .onAppear {
             cliInstalled = CrispctlInstaller.isInstalled
             settings.launchAtLogin = LaunchService.shared.isEnabled  // may change in System Settings
@@ -160,6 +187,7 @@ struct AdvancedKeyboardTab: View {
     // who never open this window are asked); then it picks which displays the keys adjust.
     // AXIsProcessTrusted() is not observable, so it is re-read when Crisp becomes active.
     @State private var isTrusted = AXIsProcessTrusted()
+    @AppStorage(BrightnessKeyService.keyDownFallbackKey) private var watchKeyDown = false
 
     /// Externals with speaker volume, which the volume keys can drive.
     private var volumeDisplays: [DisplayInfo] {
@@ -206,6 +234,15 @@ struct AdvancedKeyboardTab: View {
                             ))
                         }
                     }
+                    CenteredToggle(
+                        title: "Watch Every Key Press",
+                        // swiftlint:disable:next line_length - localized literal, splitting would change its catalog key
+                        detail: Text("For brightness keys with the lid closed, or sent as F14 and F15. Crisp acts on those keys only and stores nothing."),
+                        isOn: Binding(get: { watchKeyDown }, set: { newValue in
+                            watchKeyDown = newValue
+                            BrightnessKeyService.shared.restart()
+                        })
+                    )
                 } else {
                     // Also in the panel, which is where most people meet it.
                     CenteredToggle(

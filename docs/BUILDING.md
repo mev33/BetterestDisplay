@@ -1,68 +1,84 @@
-# Building without Xcode
+# Building the offline fork
 
-**TL;DR:** run `./dev.sh`, which compiles, swaps the binary into the installed
-`/Applications/Crisp.app`, syncs the version from `project.yml`, re-signs, and
-relaunches. The rest of this doc explains what it does.
+This fork never touches the network, at build time or at runtime. You download the
+tools once, then every build works with Wi-Fi off.
 
-You can build the full .app in Xcode (`xcodegen generate`, then archive), or a
-full DMG with `./scripts/release.sh vX.Y.Z` (swiftc, but it needs Xcode for the
-Shortcuts actions, see below). But for the fast
-dev loop, the binary alone compiles with just the Command Line Tools:
+What the app may do with administrator rights, Accessibility and monitor hardware, and how
+to undo it, is in [SAFETY.md](SAFETY.md).
 
-```sh
-./scripts/fetch-sparkle.sh   # once: vendors the Sparkle updater framework
-swiftc -O -swift-version 6 -parse-as-library \
-  -target arm64-apple-macos14.0 \
-  -import-objc-header Crisp/Crisp-Bridging-Header.h \
-  -framework AppKit -framework SwiftUI -framework IOKit -framework CoreAudio \
-  -F vendor/Sparkle -framework Sparkle \
-  -Xlinker -rpath -Xlinker @executable_path/../Frameworks \
-  -Xlinker -undefined -Xlinker dynamic_lookup \
-  Crisp/App/*.swift Crisp/Models/*.swift Crisp/Services/*.swift \
-  Crisp/Views/*.swift Crisp/Utilities/*.swift \
-  -o Crisp-bin
-```
+## One-time setup (the only downloads)
 
-To run it, swap the binary into an existing Crisp.app install and re-sign ad
-hoc (the install must contain `Contents/Frameworks/Sparkle.framework`; installs
-of a pre-Sparkle release don't, so use `./dev.sh`, which copies it in):
+1. Xcode 26 or later. The Command Line Tools are enough to build and run the app.
+   Full Xcode is also needed for `make test`, `make loc-check` and the Shortcuts
+   actions metadata.
+2. `brew install xcodegen swiftlint`. Only `make test`, `make lint` and `make check` use them.
+3. A stable signing identity, created offline in Keychain Access:
+   **Certificate Assistant > Create a Certificate…**, name `Crisp Dev`,
+   Identity Type **Self Signed Root**, Certificate Type **Code Signing**.
+   With a stable identity, macOS keeps the Accessibility grant (the brightness keys)
+   across rebuilds. Without one, builds are signed ad hoc and the grant resets every time.
+
+## Build and install
 
 ```sh
-pkill -x Crisp
-cp Crisp-bin /Applications/Crisp.app/Contents/MacOS/Crisp
-xattr -cr /Applications/Crisp.app
-codesign --force -s - --entitlements Crisp/Crisp.entitlements /Applications/Crisp.app
-open /Applications/Crisp.app
+make app      # full bundle: compile, icon, localizations, Info.plist, sign, install, launch
 ```
 
-This is the fast dev loop: edit, compile, swap, relaunch, no Xcode involved.
+This runs `scripts/build-app.sh`, which installs to `/Applications/Crisp.app`. To
+install somewhere else, set `CRISP_APP=/path/to/Crisp.app`. To only build into
+`./build/Crisp.app`, set `CRISP_INSTALL=0`. The script refuses to replace an app with
+a different bundle ID, such as an upstream Crisp install, unless `CRISP_REPLACE=1` is set.
 
-## Shortcuts actions
+Every build is signed with the hardened runtime. Each build also passes the binary
+half of `scripts/check-no-network.sh`: no networking symbols, no networking
+frameworks, no embedded frameworks and no updater feed.
 
-Shortcuts finds Crisp's actions through `Contents/Resources/Metadata.appintents`, which an Xcode build writes. `scripts/appintents.sh` does the same for the swiftc build: swiftc emits the App Intents types' const values, and `appintentsmetadataprocessor` turns them into the metadata. Both steps need Xcode's toolchain, so `release.sh` fails without Xcode, and `dev.sh` without Xcode keeps the installed app's metadata as it is, so actions you changed or added do not show in Shortcuts. After a deploy, Shortcuts picks up changed actions only after `lsregister -f /Applications/Crisp.app` and a relaunch of Shortcuts.
+## Fast loop
+
+```sh
+make dev      # recompile, swap the binary into the installed bundle, re-sign, relaunch
+```
+
+`dev.sh` swaps only into this fork's own bundle. If none is installed yet, it runs
+`scripts/build-app.sh` first.
+
+## Checks
+
+```sh
+make check    # SwiftLint --strict, unit tests, x86_64 typecheck, localization keys, no-network
+make no-network
+```
+
+To run `make check` on every push, opt in once:
+
+```sh
+git config core.hooksPath .githooks
+```
+
+## Updating from upstream
+
+There is no updater. To update, fetch upstream, read the diff, then rebuild:
+
+```sh
+git fetch upstream
+git log --oneline HEAD..upstream/main
+git diff HEAD...upstream/main -- scripts/ project.yml Makefile dev.sh .githooks/
+git rebase upstream/main
+make check && make app
+```
+
+Read every change to code that runs with admin rights, Accessibility or hardware
+access before you rebuild. `make no-network` must stay green.
 
 ## crispctl
 
-`dev.sh` swaps only the app binary. To build the command line tool on its own (the same sources `scripts/release.sh` uses):
+`crispctl` ships inside the bundle (`Contents/MacOS/crispctl`) and is built by both
+`make app` and `make dev`. To build it on its own:
 
 ```sh
 swiftc -O -swift-version 6 -target arm64-apple-macos14.0 \
   Sources/crispctl/*.swift Crisp/Models/CrispControlModel.swift Crisp/Models/BrightnessKeySteps.swift \
   -o crispctl
-```
-
-With full Xcode, `xcodegen generate && xcodebuild -scheme crispctl -configuration Release` does the same.
-
-## Before opening a PR
-
-Run `make check`: it runs SwiftLint (strict), the unit tests, the x86_64
-typecheck, and the localization key check, the same checks CI enforces, so
-failures surface locally instead of on the PR. It needs full Xcode plus
-`swiftlint` and `xcodegen` (`brew install swiftlint xcodegen`). To run it
-automatically on every push, opt in once:
-
-```sh
-git config core.hooksPath .githooks
 ```
 
 The app icon is generated from vector code: `scripts/generate-icon.swift`.

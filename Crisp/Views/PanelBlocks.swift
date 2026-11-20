@@ -258,17 +258,6 @@ struct EdgeCrossingRow: View {
     }
 }
 
-/// Update notice; renders nothing until an update is known, so it glides in.
-struct UpdateBlockView: View {
-    @ObservedObject private var updateService = UpdateService.shared
-
-    var body: some View {
-        if updateService.hasUpdate, let ver = updateService.latestVersion {
-            UpdateRow(version: ver) { updateService.installUpdate() }
-        }
-    }
-}
-
 /// Fixed footer: divider + Quit, like the Wi-Fi menu's settings footer.
 struct PanelFooterBlock: View {
     @State private var quitHovered = false

@@ -12,7 +12,7 @@ enum BrightnessKeyTarget: String, CaseIterable, Codable {
 
 /// Centralized settings persistence service.
 /// Simple settings use UserDefaults via @AppStorage-compatible keys.
-/// Complex configurations are stored as JSON in ~/Library/Application Support/Crisp/.
+/// Complex configurations are stored as JSON in ~/Library/Application Support/Crisp Offline/.
 @MainActor
 final class SettingsService: ObservableObject, @unchecked Sendable {
     static let shared = SettingsService()
@@ -20,7 +20,9 @@ final class SettingsService: ObservableObject, @unchecked Sendable {
     private let defaults = UserDefaults.standard
     private let supportDir: URL = {
         let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-        let dir = base.appendingPathComponent("Crisp", isDirectory: true)
+        // Not "Crisp": this fork keeps its own folder, so it never shares files with
+        // an upstream Crisp install (it has its own bundle ID, and so its own defaults).
+        let dir = base.appendingPathComponent("Crisp Offline", isDirectory: true)
         // One-time migration from the pre-rename storage folder.
         let legacy = base.appendingPathComponent("FreeDisplay", isDirectory: true)
         if !FileManager.default.fileExists(atPath: dir.path),

@@ -551,10 +551,11 @@ final class BrightnessService: @unchecked Sendable {
     private var lastDDCWriteInstant: [CGDirectDisplayID: DispatchTime] = [:]
     private let ddcPumpLock = NSLock()
 
-    /// Minimum spacing between DDC brightness writes to one display, per the
-    /// DDC/CI spec (see docs/ddc-notes.md); caps cadence at ~20/sec so a fast
-    /// slider drag can't flood the I2C bus.
-    private let minDDCWriteInterval: TimeInterval = 0.05
+    /// Minimum spacing between DDC brightness writes to one display. The DDC/CI spec
+    /// asks for at least 50 ms (docs/ddc-notes.md); this fork uses 100 ms, about 10
+    /// writes a second during a drag, to halve the writes that land in the monitor's
+    /// settings memory (DDCWriteBudget). The pump still writes the latest value.
+    private let minDDCWriteInterval: TimeInterval = 0.1
 
     /// Below this percent, gamma dimming layers on top of the DDC write so
     /// the slider bottom reaches dark (see docs/brightness-notes.md).

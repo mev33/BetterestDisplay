@@ -227,11 +227,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         DispatchQueue.main.async { [weak self] in
             self?.warmPanel()
         }
-
-        // Start Sparkle's background update scheduler; a found update surfaces
-        // as the panel's Update row (see UpdateService).
-        _ = UpdateService.shared
-
     }
 
     /// One-shot re-sync of everything that can drift while the panel is closed
@@ -737,7 +732,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             })
             .padding(.leading, 8)
         })
-        blocks.append(block("update") { UpdateBlockView() })
 
         let footer = block("footer") { PanelFooterBlock() }
         canvas.setBlocks(blocks, footer: footer)

@@ -271,42 +271,6 @@ struct ExpandableRow: View {
     }
 }
 
-// MARK: - UpdateRow
-
-/// Update notice styled like every other menu row (icon badge + label + hover),
-/// instead of a tinted banner, matching the native panel look.
-struct UpdateRow: View {
-    let version: String
-    let action: () -> Void
-    @State private var isHovered = false
-
-    var body: some View {
-        HStack {
-            MenuItemIcon(systemName: "arrow.down.to.line", color: .green)
-            Text("Update Available").font(.body)
-            Spacer()
-            Text("v\(version)")
-                .font(.caption)
-                .foregroundColor(.secondary)
-        }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 3)
-        .menuRowHover(isHovered)
-        .contentShape(Rectangle())
-        .onTapGesture {
-            guard PanelOpenGuard.allowsActivation else { return }
-            action()
-        }
-        .onHover { hovering in
-            isHovered = hovering
-            if hovering { NSCursor.pointingHand.push() } else { NSCursor.pop() }
-        }
-        .accessibilityLabel("Update available, version \(version)")
-        .accessibilityHint("Click to open the release page")
-        .accessibilityAddTraits(.isButton)
-    }
-}
-
 // MARK: - SettingSwitchRow
 
 /// A switch row: the panel's icon row, or a plain form toggle in Advanced Settings, which
@@ -340,63 +304,6 @@ struct SettingSwitchRow: View {
     }
 }
 
-// MARK: - SupportRow
-
-/// Optional "buy me a coffee" link at the bottom of Settings, styled as a normal
-/// menu row so it's as findable as the update row. Never a popup or launch-time nag.
-struct SupportRow: View {
-    // Owned by the parent (SettingsView) so its panel-close handler can collapse it,
-    // like every other submenu.
-    @Binding var expanded: Bool
-
-    // Shared with Advanced Settings > About.
-    static let kofi = "https://ko-fi.com/didriksg"
-    static let afdian = "https://ifdian.net/a/didriksg"
-    static let github = "https://github.com/sponsors/didriksg"
-
-    /// Payment region can't be detected reliably in a sideloaded app, so the submenu
-    /// lists every link and this only orders them: mainland China needs Afdian's
-    /// WeChat/Alipay over the Stripe-based Ko-fi/GitHub checkouts.
-    static var prefersChinese: Bool {
-        Locale.current.region?.identifier == "CN"
-            || Bundle.main.preferredLocalizations.first?.hasPrefix("zh-Hans") == true
-    }
-
-    /// Drop the "(Afdian)" romanization when the UI itself is Chinese (keyed on UI
-    /// language, not region).
-    static var afdianTitle: String {
-        Bundle.main.preferredLocalizations.first?.hasPrefix("zh") == true
-            ? "爱发电" : "爱发电 (Afdian)"
-    }
-
-    var body: some View {
-        VStack(spacing: 0) {
-            ExpandableRow(
-                icon: "heart.fill",
-                iconColor: .pink,
-                label: "Support Crisp",
-                isExpanded: $expanded
-            )
-
-            // Always laid out so the curtain glides the links open with the panel spring
-            // instead of popping to full height.
-            VStack(spacing: 0) {
-                if Self.prefersChinese {
-                    SupportLinkRow(title: Self.afdianTitle, url: Self.afdian)
-                    SupportLinkRow(title: "Ko-fi", url: Self.kofi)
-                    SupportLinkRow(title: "GitHub Sponsors", url: Self.github)
-                } else {
-                    SupportLinkRow(title: "Ko-fi", url: Self.kofi)
-                    SupportLinkRow(title: "GitHub Sponsors", url: Self.github)
-                    SupportLinkRow(title: Self.afdianTitle, url: Self.afdian)
-                }
-            }
-            .padding(.leading, 8)
-            .curtainReveal(expanded)
-        }
-    }
-}
-
 /// The last Settings row: opens the Advanced Settings window, which holds what Crisp
 /// works without (docs/DESIGN.md). An action, not a disclosure, so no chevron.
 private struct AdvancedSettingsRow: View {
@@ -425,48 +332,10 @@ private struct AdvancedSettingsRow: View {
     }
 }
 
-/// One external-link row inside the Support submenu: a label with the ↗ affordance
-/// that opens the platform's page in the browser. Brand names are verbatim so they
-/// are never localized or number-grouped.
-private struct SupportLinkRow: View {
-    let title: String
-    let url: String
-    @State private var isHovered = false
-
-    var body: some View {
-        HStack {
-            Text(verbatim: title)
-                .font(.body)
-            Spacer()
-            Image(systemName: "arrow.up.forward")
-                .font(.caption)
-                .foregroundColor(.secondary)
-                .accessibilityHidden(true)
-        }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 3)
-        .menuRowHover(isHovered)
-        .contentShape(Rectangle())
-        .onTapGesture {
-            guard let link = URL(string: url) else { return }
-            NSWorkspace.shared.open(link)
-        }
-        .onHover { hovering in
-            isHovered = hovering
-            if hovering { NSCursor.pointingHand.push() } else { NSCursor.pop() }
-        }
-        .accessibilityLabel(Text(verbatim: title))
-        .accessibilityAddTraits(.isButton)
-    }
-}
-
 // MARK: - SettingsView
 
 struct SettingsView: View {
     @ObservedObject private var settings = SettingsService.shared
-    // SettingsView stays mounted across panel opens, so expansion state must be reset
-    // explicitly on close like every other section.
-    @State private var showSupport = false
     // AXIsProcessTrusted() isn't observable, so re-read it on every open (below) or the
     // section shows stale state after the user grants/revokes in System Settings. (vx44)
     @State private var isTrusted = AXIsProcessTrusted()
@@ -587,14 +456,10 @@ struct SettingsView: View {
 
             SectionDivider()
 
-            Text("Crisp v\(UpdateService.shared.currentVersion)")
+            Text("Crisp v\(AppVersion.current)")
                 .font(.caption)
                 .foregroundColor(.secondaryReadable)
                 .padding(.horizontal, 12)
-
-            // Tucked next to the version stamp where "about" info lives; no popup, no
-            // launch nag, every feature stays free.
-            SupportRow(expanded: $showSupport)
         }
         .padding(.vertical, 6)
         .onReceive(NotificationCenter.default.publisher(for: .crispPanelDidOpen)) { _ in
@@ -608,9 +473,6 @@ struct SettingsView: View {
             // closing and reopening the panel.
             isTrusted = AXIsProcessTrusted()
             if isTrusted { BrightnessKeyService.shared.start() }
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .crispPanelDidClose)) { _ in
-            showSupport = false
         }
     }
 }

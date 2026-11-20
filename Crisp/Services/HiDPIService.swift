@@ -120,13 +120,7 @@ final class HiDPIService: @unchecked Sendable {
     /// Writes the override plist with the given scale-resolutions entries via admin auth,
     /// then re-probes so macOS re-enumerates modes. Shared by normal HiDPI and smooth scaling.
     private func writeScaledModesPlist(vendor: UInt32, product: UInt32, scaledModes: [Data]) -> String? {
-        let command: String
-        do {
-            command = try HiDPIOverrideCommand.install(vendor: vendor, product: product, scaledModes: scaledModes)
-        } catch {
-            return "Failed to generate override: \(error.localizedDescription)"
-        }
-        if let err = executePrivilegedCommand(HiDPIOverrideCommand.appleScriptLiteral(command)) {
+        if let err = runPrivileged(.installDisplayOverride(vendor: vendor, product: product, scaledModes: scaledModes)) {
             return err
         }
 
@@ -139,24 +133,30 @@ final class HiDPIService: @unchecked Sendable {
         let plistPath = overridePlistURL(vendor: vendor, product: product).path
         guard FileManager.default.fileExists(atPath: plistPath) else { return nil }
 
-        if let err = executePrivilegedCommand("rm -f '\(plistPath)'") {
-            return err
-        }
-        return nil
+        return runPrivileged(.removeDisplayOverride(vendor: vendor, product: product))
     }
 
     // MARK: - Helpers
 
-    /// Executes a shell command with administrator privileges via AppleScript.
+    /// What `runPrivileged` returns when the person cancels the password prompt.
+    static let authorizationCanceled = "User canceled authorization"
+
+    /// Runs one of the fixed root operations behind the administrator prompt. The first
+    /// time a file is changed, its original (or its absence) goes into
+    /// SystemFileManifest, so Advanced Settings can put it back later.
     /// Returns nil on success, or an error message on failure.
-    func executePrivilegedCommand(_ command: String) -> String? {
-        let script = """
-            do shell script "\(command)" with administrator privileges
-            """
-        var error: NSDictionary?
+    func runPrivileged(_ operation: PrivilegedOperation) -> String? {
+        let script: String
+        do {
+            script = try operation.appleScriptSource()
+        } catch {
+            return "Failed to prepare the change: \(error.localizedDescription)"
+        }
         guard let appleScript = NSAppleScript(source: script) else {
             return "Failed to create AppleScript"
         }
+        SystemFileManifest.shared.recordOriginal(before: operation)
+        var error: NSDictionary?
         // The auth dialog steals key focus and would trip the panel's auto-dismiss;
         // suppress it, and keep suppression alive briefly after the dialog closes.
         PanelOpenGuard.suppressAutoDismiss = true
@@ -172,17 +172,18 @@ final class HiDPIService: @unchecked Sendable {
             }
         }
         appleScript.executeAndReturnError(&error)
-        if let error = error {
+        if let error {
             let msg = error[NSAppleScript.errorMessage] as? String ?? "Unknown error"
             if msg.contains("canceled") || msg.contains("Cancel") {
-                return "User canceled authorization"
+                return Self.authorizationCanceled
             }
             return "Administrator authorization failed: \(msg)"
         }
         return nil
     }
 
-    private func triggerDisplayReenumeration(vendor: UInt32, product: UInt32) {
+    /// Re-probes the display connections so macOS re-reads the override plists.
+    func triggerDisplayReenumeration(vendor: UInt32, product: UInt32) {
         var iterator: io_iterator_t = 0
         let matching = IOServiceMatching("IODisplayConnect")
         guard IOServiceGetMatchingServices(kIOMainPortDefault, matching, &iterator) == KERN_SUCCESS else { return }

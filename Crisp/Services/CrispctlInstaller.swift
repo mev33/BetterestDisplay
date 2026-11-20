@@ -1,17 +1,23 @@
 import Foundation
 import os
 
-/// Puts the bundled crispctl (Contents/MacOS/crispctl) on the PATH via a symlink into
-/// /usr/local/bin, behind the same admin prompt as the HiDPI override (root-owned dir).
+/// Puts the bundled crispctl (Contents/MacOS/crispctl) on the PATH with a symlink in
+/// ~/.local/bin. No administrator prompt: the folder belongs to you. Add it to your PATH
+/// once if your shell doesn't already have it: export PATH="$HOME/.local/bin:$PATH".
+///
+/// The link is only ever created or removed when it is a symlink: a regular file or a
+/// folder at that path is not ours and is left alone.
 @MainActor
 enum CrispctlInstaller {
     private static let log = Logger(subsystem: "com.crisp.app", category: "app")
-    static let linkPath = "/usr/local/bin/crispctl"
+    static let linkDirectory = FileManager.default.homeDirectoryForCurrentUser
+        .appendingPathComponent(".local/bin").path
+    static let linkPath = linkDirectory + "/crispctl"
     static let bundledPath = Bundle.main.bundleURL.appendingPathComponent("Contents/MacOS/crispctl").path
 
-    /// False on a dev build (dev.sh swaps the app binary only) and while the app
-    /// runs translocated from a DMG or Downloads, where the bundle path is a
-    /// temporary mount and a link to it would dangle on the next launch.
+    /// False on a dev build without crispctl and while the app runs translocated from a
+    /// DMG or Downloads, where the bundle path is a temporary mount and a link to it
+    /// would dangle on the next launch.
     static var isAvailable: Bool {
         FileManager.default.isExecutableFile(atPath: bundledPath)
             && !bundledPath.contains("/AppTranslocation/")
@@ -23,27 +29,33 @@ enum CrispctlInstaller {
     }
 
     static func install() {
-        // Try unprivileged first (VS Code's shell command install does the same): works
-        // where /usr/local/bin belongs to the user, e.g. Intel Macs with Homebrew.
         let fm = FileManager.default
-        if (try? fm.destinationOfSymbolicLink(atPath: linkPath)) != nil { try? fm.removeItem(atPath: linkPath) }
-        if (try? fm.createSymbolicLink(atPath: linkPath, withDestinationPath: bundledPath)) != nil { return }
-        // Single-quoted for the shell, then escaped for the AppleScript literal.
-        let shellPath = bundledPath.replacingOccurrences(of: "'", with: "'\\''")
-        let command = "mkdir -p /usr/local/bin && ln -sfn '\(shellPath)' \(linkPath)"
-            .replacingOccurrences(of: "\\", with: "\\\\")
-            .replacingOccurrences(of: "\"", with: "\\\"")
-        if let error = HiDPIService.shared.executePrivilegedCommand(command) {
-            log.error("crispctl install failed: \(error, privacy: .public)")
+        do {
+            try fm.createDirectory(atPath: linkDirectory, withIntermediateDirectories: true)
+            if isSymlink(linkPath) {
+                try fm.removeItem(atPath: linkPath)
+            } else if fm.fileExists(atPath: linkPath) {
+                log.error("crispctl install skipped: \(linkPath, privacy: .public) exists and is not a link")
+                return
+            }
+            try fm.createSymbolicLink(atPath: linkPath, withDestinationPath: bundledPath)
+        } catch {
+            log.error("crispctl install failed: \(error.localizedDescription, privacy: .public)")
         }
     }
 
-    /// Removes the link; a regular file at that path is not ours and is left alone.
     static func uninstall() {
-        guard (try? FileManager.default.destinationOfSymbolicLink(atPath: linkPath)) != nil else { return }
-        if (try? FileManager.default.removeItem(atPath: linkPath)) != nil { return }
-        if let error = HiDPIService.shared.executePrivilegedCommand("rm -f \(linkPath)") {
-            log.error("crispctl uninstall failed: \(error, privacy: .public)")
+        guard isSymlink(linkPath) else { return }
+        do {
+            try FileManager.default.removeItem(atPath: linkPath)
+        } catch {
+            log.error("crispctl uninstall failed: \(error.localizedDescription, privacy: .public)")
         }
+    }
+
+    /// lstat, so a link is seen as a link even when what it points at is gone.
+    private static func isSymlink(_ path: String) -> Bool {
+        var info = stat()
+        return lstat(path, &info) == 0 && (info.st_mode & S_IFMT) == S_IFLNK
     }
 }

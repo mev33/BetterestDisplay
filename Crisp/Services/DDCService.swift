@@ -498,6 +498,12 @@ final class DDCService: ObservableObject, @unchecked Sendable {
     /// Synchronous DDC write (VCP Set). Returns true on success.
     /// On ARM64 uses the IOAVService path; on x86_64 uses the IOFramebuffer I2C path.
     private func writeSynchronous(displayID: CGDirectDisplayID, command: UInt8, value: UInt16) -> Bool {
+        // Every VCP Set passes here: anything off the allowlist (a factory reset, a
+        // settings save, a manufacturer code) is refused before it reaches the bus.
+        guard DDCWritePolicy.allows(command) else {
+            Self.log.error("refused write \(Self.hex(command), privacy: .public) display \(displayID, privacy: .public): VCP code not on the allowlist")
+            return false
+        }
         let start = DispatchTime.now()
         defer {
             let ms = Self.millisSince(start)

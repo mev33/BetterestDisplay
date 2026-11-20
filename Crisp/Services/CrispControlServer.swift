@@ -91,10 +91,21 @@ final class CrispControlServer {
         }
     }
 
+    /// Advanced Settings > Automation > Read-Only. Read straight from UserDefaults,
+    /// which is thread-safe, so the accept path never waits on the main actor.
+    nonisolated static let readOnlyDefaultsKey = "crisp.cliReadOnly"
+
     private nonisolated func serve(_ client: Int32) async {
         let data: Data
         switch Self.read(client) {
-        case let .frame(request): data = await response(to: request)
+        case let .frame(request):
+            // Socket clients only: Shortcuts actions come in through handle(_:) instead.
+            let readOnly = UserDefaults.standard.bool(forKey: Self.readOnlyDefaultsKey)
+            if let refusal = CrispControlModel.socketRefusal(for: request, readOnly: readOnly) {
+                data = CrispControlModel.encode(refusal)
+            } else {
+                data = await response(to: request)
+            }
         case let .failure(message): data = CrispControlModel.encode(.failure(message))
         case .incomplete: data = CrispControlModel.encode(.failure("request read failed"))
         }

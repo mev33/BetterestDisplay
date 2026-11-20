@@ -64,6 +64,16 @@ final class BrightnessKeyService: @unchecked Sendable {
 
     // MARK: - Start / Stop
 
+    /// Advanced Settings > Keyboard > Watch Every Key Press. Off by default: the tap then
+    /// sees only media-key events (NX_SYSDEFINED), never what you type.
+    nonisolated static let keyDownFallbackKey = "crisp.brightnessKeysWatchKeyDown"
+
+    /// Re-creates the tap, for a change of what it watches.
+    func restart() {
+        stop()
+        start()
+    }
+
     /// Installs the event tap. Requires Accessibility permissions.
     /// Safe to call multiple times, a running tap will not be re-created.
     func start() {
@@ -74,12 +84,16 @@ final class BrightnessKeyService: @unchecked Sendable {
         let retained = Unmanaged.passRetained(self)
         selfRetained = retained
 
-        // Also tap keyDown (type 10), not just NX_SYSDEFINED. When there is no built-in display to
-        // target (e.g. clamshell) macOS can suppress the brightness NX_SYSDEFINED aux event while
-        // the raw keyDown still flows, so a SYSDEFINED-only tap goes dead there. See the keyDown
-        // fallback in handleEventFromCallback. (issue #21)
-        let mask = CGEventMask(1 << Self.cgEventTypeSystemDefinedRaw)
-            | CGEventMask(1 << CGEventType.keyDown.rawValue)
+        // NX_SYSDEFINED only, unless the person opted in to keyDown (type 10) too. A keyDown
+        // tap receives every key press in the session, so it is opt-in. It is needed when
+        // there is no built-in display to target (clamshell), where macOS can suppress the
+        // brightness NX_SYSDEFINED aux event while the raw keyDown still flows (issue #21),
+        // and for keyboards that send brightness as F14/F15 (issue #69). See the keyDown
+        // fallback in handleEventFromCallback. Either way nothing is logged or stored.
+        var mask = CGEventMask(1 << Self.cgEventTypeSystemDefinedRaw)
+        if UserDefaults.standard.bool(forKey: Self.keyDownFallbackKey) {
+            mask |= CGEventMask(1 << CGEventType.keyDown.rawValue)
+        }
 
         let tap = CGEvent.tapCreate(
             tap: .cgSessionEventTap,
