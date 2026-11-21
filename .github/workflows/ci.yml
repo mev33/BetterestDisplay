@@ -1,0 +1,79 @@
+name: CI
+
+# Offline personal fork: the gate is `make check` locally (and the .githooks
+# pre-push hook). CI runs only when started by hand, so it never spends macOS
+# runner minutes on its own. Pick a runner label your account has.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  # Everything a pull request is held to. The job name is the status check
+  # main's branch rule requires, so it stays "build".
+  build:
+    # The Xcode that releases are built with (docs/best-practice/ci-xcode-version.md).
+    # It also has the macOS 26 SDK's NSGlassEffectView, which the panel backdrop
+    # needs at compile time even though it's #available-gated at runtime.
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      # Lint, enforcing: the baseline is clean, so any violation (warning or
+      # error) fails via --strict. Run locally with `swiftlint lint --strict`;
+      # without full Xcode, SWIFTLINT_DISABLE_SOURCEKIT=1 skips the
+      # SourceKit-backed rules, so CI stays the authoritative check.
+      #
+      # The image ships no swiftlint, so install it explicitly (a
+      # missing binary used to be swallowed as a silent no-op).
+      - name: Install SwiftLint and xcodegen
+        run: HOMEBREW_NO_AUTO_UPDATE=1 brew install swiftlint xcodegen
+      - name: Lint (SwiftLint)
+        run: swiftlint lint --strict --reporter github-actions-logging
+      # Unit tests. Run locally with `make test` (needs full Xcode; the app
+      # itself builds with just the Command Line Tools). CI is the enforced
+      # gate: the suite was once never executed anywhere, which is how the
+      # "-- Hz" bug and the untested doc-comment contract in DisplayMode
+      # survived to a release.
+      - name: Test
+        run: make test
+      # The release binary is universal. Code that only compiles on arm64 (an
+      # `#if arch(arm64)` block a caller outside it depends on, how #110 first
+      # failed) breaks the x86_64 slice, and typechecking that slice takes
+      # seconds where the universal build in the job below takes minutes.
+      - name: Typecheck the x86_64 slice
+        run: make typecheck-x86
+      # Every localization key the code uses must exist in the String Catalog.
+      # SwiftUI coalesces interpolated text into "%@"-style lookup keys, and a
+      # key missing from the catalog silently falls back to English at runtime
+      # (issue class fixed in PR #34). Export what the compiler extracts and
+      # diff it against the catalog. Pre-existing gaps are tracked in the
+      # allowlist next to the script; remove entries as they get fixed. The export
+      # writes the keys it extracts into the catalog, so the committed file is put
+      # back before the check reads it.
+      - name: Check localization keys
+        run: |
+          mkdir -p build && cp Crisp/Resources/Localizable.xcstrings build/Localizable.xcstrings.orig
+          xcodebuild -quiet -exportLocalizations -project Crisp.xcodeproj \
+            -localizationPath build/loc CODE_SIGNING_ALLOWED=NO \
+            SWIFT_EMIT_LOC_STRINGS=YES
+          cp build/Localizable.xcstrings.orig Crisp/Resources/Localizable.xcstrings
+          python3 scripts/check-localization-keys.py build/loc/en.xcloc \
+            Crisp/Resources/Localizable.xcstrings scripts/i18n-missing-allowlist.txt
+      # Advisory: this fork is for one person, so a missing Chinese translation is
+      # reported but never fails the run.
+      - name: Translation completeness (advisory)
+        run: python3 scripts/check-translations.py Crisp/Resources/Localizable.xcstrings || true
+
+  # The full offline bundle build (scripts/build-app.sh, not installed), which also
+  # runs the binary half of the no-network check on the result.
+  app-build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: No-network check (sources and build scripts)
+        run: ./scripts/check-no-network.sh
+      - name: Build the app bundle
+        run: CRISP_INSTALL=0 ./scripts/build-app.sh

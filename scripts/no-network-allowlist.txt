@@ -1,0 +1,9 @@
+# Known-harmless hits for scripts/check-no-network.sh, one per line:
+#   <repo-relative path><TAB><literal text that appears on the flagged line>
+# Every entry needs a reason in the comment above it. Keep this list short.
+
+# A help message telling you how to install SwiftLint; nothing is downloaded.
+Makefile	echo "SwiftLint not installed: brew install swiftlint"
+
+# The standard plist DOCTYPE. It is an identifier string; nothing fetches it.
+scripts/build-app.sh	"http://www.apple.com/DTDs/PropertyList-1.0.dtd"
