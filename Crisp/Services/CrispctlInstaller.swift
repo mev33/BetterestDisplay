@@ -1,7 +1,7 @@
 import Foundation
 import os
 
-/// Puts the bundled crispctl (Contents/MacOS/crispctl) on the PATH with a symlink in
+/// Puts the bundled bdctl (Contents/MacOS/bdctl) on the PATH with a symlink in
 /// ~/.local/bin. No administrator prompt: the folder belongs to you. Add it to your PATH
 /// once if your shell doesn't already have it: export PATH="$HOME/.local/bin:$PATH".
 ///
@@ -12,10 +12,10 @@ enum CrispctlInstaller {
     private static let log = Logger(subsystem: "com.crisp.app", category: "app")
     static let linkDirectory = FileManager.default.homeDirectoryForCurrentUser
         .appendingPathComponent(".local/bin").path
-    static let linkPath = linkDirectory + "/crispctl"
-    static let bundledPath = Bundle.main.bundleURL.appendingPathComponent("Contents/MacOS/crispctl").path
+    static let linkPath = linkDirectory + "/bdctl"
+    static let bundledPath = Bundle.main.bundleURL.appendingPathComponent("Contents/MacOS/bdctl").path
 
-    /// False on a dev build without crispctl and while the app runs translocated from a
+    /// False on a dev build without bdctl and while the app runs translocated from a
     /// DMG or Downloads, where the bundle path is a temporary mount and a link to it
     /// would dangle on the next launch.
     static var isAvailable: Bool {
@@ -35,12 +35,12 @@ enum CrispctlInstaller {
             if isSymlink(linkPath) {
                 try fm.removeItem(atPath: linkPath)
             } else if fm.fileExists(atPath: linkPath) {
-                log.error("crispctl install skipped: \(linkPath, privacy: .public) exists and is not a link")
+                log.error("bdctl install skipped: \(linkPath, privacy: .public) exists and is not a link")
                 return
             }
             try fm.createSymbolicLink(atPath: linkPath, withDestinationPath: bundledPath)
         } catch {
-            log.error("crispctl install failed: \(error.localizedDescription, privacy: .public)")
+            log.error("bdctl install failed: \(error.localizedDescription, privacy: .public)")
         }
     }
 
@@ -49,7 +49,7 @@ enum CrispctlInstaller {
         do {
             try FileManager.default.removeItem(atPath: linkPath)
         } catch {
-            log.error("crispctl uninstall failed: \(error.localizedDescription, privacy: .public)")
+            log.error("bdctl uninstall failed: \(error.localizedDescription, privacy: .public)")
         }
     }
 

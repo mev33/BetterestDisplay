@@ -1,6 +1,6 @@
 import XCTest
 
-/// crispctl's input commands (#196): which display they reach, and which they refuse.
+/// bdctl's input commands (#196): which display they reach, and which they refuse.
 final class CrispControlInputTests: XCTestCase {
     private let display = CrispControlDisplay(
         id: 7, name: "Q27G3XMN", brightness: 56, isBuiltin: false,

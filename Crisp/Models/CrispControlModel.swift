@@ -2,7 +2,7 @@ import Foundation
 
 enum CrispControlSocket {
     static let path = FileManager.default.temporaryDirectory
-        .appendingPathComponent("crispctl.sock").path
+        .appendingPathComponent("bdctl.sock").path
 }
 struct CrispControlResolution: Codable, Equatable {
     let logicalWidth: Int
@@ -100,7 +100,7 @@ struct CrispControlRequest: Codable, Equatable {
 
         /// Can take a screen away: a disconnect, an input switch (the Mac loses that
         /// display), or a preset that turns displays off or switches inputs. Over the
-        /// socket these need `confirmed`, which crispctl sets for --confirm, so a script
+        /// socket these need `confirmed`, which bdctl sets for --confirm, so a script
         /// or another process running as you cannot blank a screen by accident.
         var needsConfirmation: Bool {
             switch self {
@@ -125,7 +125,7 @@ struct CrispControlRequest: Codable, Equatable {
     let input: String?
     /// `setRotation`: 0, 90, 180 or 270 degrees.
     let rotation: Int?
-    /// crispctl's --confirm: required over the socket for commands that need confirmation.
+    /// bdctl's --confirm: required over the socket for commands that need confirmation.
     let confirmed: Bool?
     init(
         command: Command,
@@ -170,7 +170,7 @@ struct CrispControlInput: Codable, Equatable {
     let value: Int
     let name: String
 }
-/// A display's inputs as crispctl lists them. `current` is the input this Mac is on,
+/// A display's inputs as bdctl lists them. `current` is the input this Mac is on,
 /// nil when Crisp cannot read it and nobody chose it in the menu.
 struct CrispControlInputs: Codable, Equatable {
     let displayID: UInt32
@@ -182,7 +182,7 @@ struct CrispControlInputChange: Equatable {
     let displayID: UInt32
     let input: String
 }
-/// A saved preset as crispctl lists it. `captures` names what applying it changes
+/// A saved preset as bdctl lists it. `captures` names what applying it changes
 /// (resolution, brightness, arrangement, imageAdjustment, hdr, connection, color); `displays` are the uuids it
 /// has settings for; `active` is true for the preset last applied until a manual change.
 struct CrispControlPreset: Codable, Equatable {
@@ -192,7 +192,7 @@ struct CrispControlPreset: Codable, Equatable {
     let displays: [String]
     let active: Bool
 }
-/// A saved virtual display as crispctl lists it; `active` is true while it is on.
+/// A saved virtual display as bdctl lists it; `active` is true while it is on.
 struct CrispControlVirtualDisplay: Codable, Equatable {
     let id: String
     let name: String
@@ -201,7 +201,7 @@ struct CrispControlVirtualDisplay: Codable, Equatable {
     let hiDPI: Bool
     let active: Bool
 }
-/// One Image Adjustment slider or switch as crispctl names it.
+/// One Image Adjustment slider or switch as bdctl names it.
 enum CrispControlImageSetting: String, CaseIterable, Codable {
     case contrast, gamma, gain, temperature
     case redGamma = "red-gamma", greenGamma = "green-gamma", blueGamma = "blue-gamma"
@@ -217,7 +217,7 @@ enum CrispControlImageSetting: String, CaseIterable, Codable {
         }
     }
 }
-/// A display's Image Adjustment as crispctl reports it. `paused` is read-only: Pause in
+/// A display's Image Adjustment as bdctl reports it. `paused` is read-only: Pause in
 /// the menu shows the display without the adjustment but keeps the values.
 struct CrispControlImageAdjustment: Codable, Equatable {
     let displayID: UInt32
@@ -445,7 +445,7 @@ enum CrispControlModel {
         return .success(hdr: .init(displayID: displayID, enabled: enabled))
     }
     static let hdrUncertainRecovery = "outcome is uncertain; do not retry automatically—run "
-        + "'crispctl hdr get <display>' before deciding whether to retry"
+        + "'bdctl hdr get <display>' before deciding whether to retry"
 
     /// The socket's own checks, ahead of `handle`: a read-only command line serves reads
     /// only, and a command that can take a screen away needs --confirm. Nil lets the
@@ -732,7 +732,7 @@ enum CrispControlModel {
             return .init(
                 .failure(
                     "explicit HDR is unsupported for built-in displays; use Extra Brightness "
-                        + "with 'crispctl brightness boost set <display> on' when eligible"
+                        + "with 'bdctl brightness boost set <display> on' when eligible"
                 ), nil, nil, nil
             )
         }
@@ -822,12 +822,14 @@ enum CrispControlCLIModel {
         }
         var description: String {
             switch self {
-            case .display: return "List, connect and disconnect the displays Crisp controls, switch their inputs and rotate them."
+            case .display:
+                return "List, connect and disconnect the displays BetterestDisplay controls, "
+                    + "switch their inputs and rotate them."
             case .brightness: return "Read and set brightness and Extra Brightness."
             case .hdr: return "Read and switch HDR on external displays."
             case .image: return "Read and set Image Adjustment: contrast, gamma, color temperature and the other sliders."
-            case .preset: return "List and apply the presets saved in Crisp."
-            case .virtual: return "List the virtual displays saved in Crisp and turn them on or off."
+            case .preset: return "List and apply the presets saved in BetterestDisplay."
+            case .virtual: return "List the virtual displays saved in BetterestDisplay and turn them on or off."
             }
         }
     }
@@ -858,7 +860,8 @@ enum CrispControlCLIModel {
     static let entries: [Entry] = [
         Entry(group: .display, usage: "display list", summary: "List displays", detail: """
             Each display carries id, uuid, name, resolution, brightness, maxBrightness,
-            brightnessBackend and connected, which is false while Crisp holds it off.
+            brightnessBackend and connected, which is false while BetterestDisplay holds
+            it off.
             """),
         Entry(group: .display, usage: "display connect <display>", summary: "Put a disconnected display back", detail: """
             Asking for the state a display is already in succeeds and changes nothing.
@@ -877,8 +880,8 @@ enum CrispControlCLIModel {
         Entry(group: .display, usage: "display input list <display>", summary: "List a monitor's inputs", detail: """
             Each input carries value and name, from the list the monitor reports, or a
             standard list when it reports none. current is the input this Mac is on, or
-            null when Crisp cannot read it. The first call for a monitor reads its list,
-            which can take half a minute.
+            null when BetterestDisplay cannot read it. The first call for a monitor reads
+            its list, which can take half a minute.
             """),
         Entry(group: .display, usage: "display input set <display> <input>", summary: "Switch a monitor to another input", detail: """
             <input> is a name (HDMI 1, hdmi1, dp2, usb-c) or a number, decimal (17) or
@@ -900,7 +903,8 @@ enum CrispControlCLIModel {
             <percent> is 0-100, or up to maxBrightness while Extra Brightness is enabled
             and eligible; boosted values past the live maximum are refused, not clamped.
             A set is a manual change like the slider and clears the active preset. The
-            reply means Crisp accepted the request, not that the panel was read back.
+            reply means BetterestDisplay accepted the request, not that the panel was
+            read back.
             """),
         Entry(group: .brightness, usage: "brightness boost get <display>", summary: "Read Extra Brightness state",
               detail: "Whether the display is eligible for Extra Brightness and whether it is on."),
@@ -956,12 +960,13 @@ enum CrispControlCLIModel {
     ]
     static let otherRows: [(usage: String, arguments: String, summary: String)] = [
         ("help", "", "Show this help (also -h, --help)"),
-        ("version", "", "Show the Crisp version this tool ships with (also --version)")
+        ("version", "", "Show the BetterestDisplay version this tool ships with (also --version)")
     ]
 
     static let intro = """
-        Control a running Crisp from the command line. Crisp must be running for the
-        same user; crispctl talks to it over a local socket and never launches it.
+        Control a running BetterestDisplay from the command line. BetterestDisplay must
+        be running for the same user; bdctl talks to it over a local socket and never
+        launches it.
         """
     static let displayNote = """
         <display> is a runtime id or a uuid from 'display list'. Ids can change after
@@ -975,13 +980,14 @@ enum CrispControlCLIModel {
         describe.
         Commands that can take a display away (display disconnect, display toggle,
         display input set, preset apply) need --confirm, anywhere among the arguments.
-        Exit codes: 0 ok, 1 Crisp unreachable, 2 bad arguments, 3 Crisp refused.
+        Exit codes: 0 ok, 1 BetterestDisplay unreachable, 2 bad arguments,
+        3 BetterestDisplay refused.
         """
 
     /// The top-level reference: one line per command, the way docker and gh lay
     /// theirs out. The detail lives on the group and command pages.
     static let help: String = {
-        var lines = [intro, "", "Usage:  crispctl <command> <subcommand> [<args>]", ""]
+        var lines = [intro, "", "Usage:  bdctl <command> <subcommand> [<args>]", ""]
         let widths = columnWidths(entries.map(\.columns) + otherRows.map { ($0.usage, $0.arguments) })
         for group in Group.allCases {
             lines.append(group.title + ":")
@@ -990,12 +996,12 @@ enum CrispControlCLIModel {
         }
         lines.append("Other commands:")
         for other in otherRows { lines.append(row((other.usage, other.arguments), other.summary, widths)) }
-        lines += ["", displayNote, "", contract, "", "Run 'crispctl <command> --help' for more information on a command."]
+        lines += ["", displayNote, "", contract, "", "Run 'bdctl <command> --help' for more information on a command."]
         return lines.joined(separator: "\n")
     }()
 
-    /// One group's page, printed for `crispctl display`, `crispctl display help`
-    /// and `crispctl display --help`: what `docker container --help` prints.
+    /// One group's page, printed for `bdctl display`, `bdctl display help`
+    /// and `bdctl display --help`: what `docker container --help` prints.
     static func help(for group: Group) -> String {
         let inGroup = entries.filter { $0.group == group }
         let rows = inGroup.map { entry -> (command: String, arguments: String) in
@@ -1003,15 +1009,15 @@ enum CrispControlCLIModel {
             return (String(columns.command.dropFirst(group.rawValue.count + 1)), columns.arguments)
         }
         let widths = columnWidths(rows)
-        var lines = [group.description, "", "Usage:  crispctl \(group.rawValue) <subcommand> [<args>]", "", "Commands:"]
+        var lines = [group.description, "", "Usage:  bdctl \(group.rawValue) <subcommand> [<args>]", "", "Commands:"]
         lines += zip(rows, inGroup).map { row($0, $1.summary, widths) }
-        lines += ["", "Run 'crispctl \(group.rawValue) <subcommand> --help' for more information on a command."]
+        lines += ["", "Run 'bdctl \(group.rawValue) <subcommand> --help' for more information on a command."]
         return lines.joined(separator: "\n")
     }
 
     /// One command's page, printed for any invocation of it that ends in --help or -h.
     static func help(for entry: Entry) -> String {
-        var lines = ["Usage:  crispctl \(entry.usage)", "", entry.summary + "."]
+        var lines = ["Usage:  bdctl \(entry.usage)", "", entry.summary + "."]
         if !entry.detail.isEmpty { lines += ["", entry.detail] }
         return lines.joined(separator: "\n")
     }
@@ -1058,7 +1064,7 @@ enum CrispControlCLIModel {
         }
     }
     static func parse(arguments: [String]) -> ParseResult {
-        // --confirm may stand anywhere, like --json (which crispctl strips before this).
+        // --confirm may stand anywhere, like --json (which bdctl strips before this).
         let confirmed = arguments.contains("--confirm")
         let arguments = arguments.filter { $0 != "--confirm" }
         if let help = helpRequest(arguments) { return help }
@@ -1082,7 +1088,7 @@ enum CrispControlCLIModel {
     static func usageMessage(for arguments: [String]) -> String {
         guard let first = arguments.first, let group = Group(rawValue: first) else {
             let word = arguments.first.map { "unknown command '\($0)'; " } ?? ""
-            return word + "run 'crispctl help' for the commands"
+            return word + "run 'bdctl help' for the commands"
         }
         let inGroup = entries.filter { $0.group == group }
         // The longest command whose literal words open the invocation, else every
@@ -1091,9 +1097,9 @@ enum CrispControlCLIModel {
         let matches = opened.map { [$0] } ?? inGroup.filter { $0.words.starts(with: arguments) }
         guard !matches.isEmpty else {
             let name = arguments.prefix(2).joined(separator: " ")
-            return "unknown command '\(name)'; run 'crispctl \(group.rawValue)' for the \(group.rawValue) commands"
+            return "unknown command '\(name)'; run 'bdctl \(group.rawValue)' for the \(group.rawValue) commands"
         }
-        return "usage: " + matches.map { "crispctl " + $0.usage }.joined(separator: " or ")
+        return "usage: " + matches.map { "bdctl " + $0.usage }.joined(separator: " or ")
     }
     private static func matchedRequest(_ arguments: [String]) -> CrispControlRequest? {
         if arguments == ["display", "list"] {
@@ -1197,7 +1203,7 @@ enum CrispControlCLIModel {
         return response.error != nil ? .serverFailure : .invalid
     }
 }
-/// What crispctl prints without --json (#227): text for people, which can change from
+/// What bdctl prints without --json (#227): text for people, which can change from
 /// one release to the next; scripts and agents read --json. A read prints a table or a
 /// value. A change prints nothing, except a change of connection or of a virtual display
 /// (the state it ended in) and a preset that skipped displays.

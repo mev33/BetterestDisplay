@@ -1,6 +1,6 @@
 import XCTest
 
-/// The crispctl preset commands (#188): the reply scripts parse, and how a typed
+/// The bdctl preset commands (#188): the reply scripts parse, and how a typed
 /// selector finds one preset.
 final class CrispControlPresetTests: XCTestCase {
     /// Scripts and Shortcuts parse this reply, so its field names are the contract.

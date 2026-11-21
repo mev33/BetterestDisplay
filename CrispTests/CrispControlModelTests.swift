@@ -109,7 +109,7 @@ final class CrispControlModelTests: XCTestCase {
         // The top-level reference names every command, each group's page names its own
         // subcommands without the group, and each command's page opens with its usage.
         // The tables are three columns, so a command and its arguments are padded apart.
-        for word in ["help", "version", "crispctl <command>"] {
+        for word in ["help", "version", "bdctl <command>"] {
             XCTAssertTrue(CrispControlCLIModel.help.contains(word), word)
         }
         XCTAssertEqual(CrispControlCLIModel.entries.count, 22)
@@ -121,30 +121,30 @@ final class CrispControlModelTests: XCTestCase {
             let name = String(columns.command.dropFirst(entry.group.rawValue.count + 1))
             XCTAssertTrue(page.contains("  " + name + " "), entry.usage)
             XCTAssertFalse(page.contains("  " + entry.group.rawValue + " "), entry.usage)
-            XCTAssertTrue(CrispControlCLIModel.help(for: entry).hasPrefix("Usage:  crispctl " + entry.usage + "\n"), entry.usage)
+            XCTAssertTrue(CrispControlCLIModel.help(for: entry).hasPrefix("Usage:  bdctl " + entry.usage + "\n"), entry.usage)
         }
     }
 
     /// This fork has no agent-skill installer (it wrote into other apps' folders).
     func testSkillIsNoLongerACommand() {
         XCTAssertEqual(CrispControlCLIModel.parse(arguments: ["skill", "install", "claude"]),
-                       .failure("unknown command 'skill'; run 'crispctl help' for the commands"))
+                       .failure("unknown command 'skill'; run 'bdctl help' for the commands"))
         XCTAssertFalse(CrispControlCLIModel.help.contains("skill"))
     }
 
     func testParserNamesTheUsageAWrongInvocationWasClosestTo() {
         let cases: [([String], String)] = [
-            (["bogus"], "unknown command 'bogus'; run 'crispctl help' for the commands"),
-            (["help", "me"], "unknown command 'help'; run 'crispctl help' for the commands"),
-            (["displays", "list"], "unknown command 'displays'; run 'crispctl help' for the commands"),
-            (["display", "reboot", "42"], "unknown command 'display reboot'; run 'crispctl display' for the display commands"),
-            (["display", "list", "--json"], "usage: crispctl display list"),
-            (["brightness", "set", "42"], "usage: crispctl brightness set <display> <percent>"),
-            (["brightness", "set", "42", "nan"], "usage: crispctl brightness set <display> <percent>"),
-            (["brightness", "boost", "set", "42"], "usage: crispctl brightness boost set <display> on|off"),
+            (["bogus"], "unknown command 'bogus'; run 'bdctl help' for the commands"),
+            (["help", "me"], "unknown command 'help'; run 'bdctl help' for the commands"),
+            (["displays", "list"], "unknown command 'displays'; run 'bdctl help' for the commands"),
+            (["display", "reboot", "42"], "unknown command 'display reboot'; run 'bdctl display' for the display commands"),
+            (["display", "list", "--json"], "usage: bdctl display list"),
+            (["brightness", "set", "42"], "usage: bdctl brightness set <display> <percent>"),
+            (["brightness", "set", "42", "nan"], "usage: bdctl brightness set <display> <percent>"),
+            (["brightness", "boost", "set", "42"], "usage: bdctl brightness boost set <display> on|off"),
             (["brightness", "boost"],
-             "usage: crispctl brightness boost get <display> or crispctl brightness boost set <display> on|off"),
-            (["display", "toggle", "42", "now"], "usage: crispctl display toggle <display>")
+             "usage: bdctl brightness boost get <display> or bdctl brightness boost set <display> on|off"),
+            (["display", "toggle", "42", "now"], "usage: bdctl display toggle <display>")
         ]
         for (arguments, message) in cases {
             XCTAssertEqual(CrispControlCLIModel.parse(arguments: arguments), .failure(message), "\(arguments)")
@@ -394,7 +394,7 @@ final class CrispControlModelTests: XCTestCase {
             builtInResult.response,
             .failure(
                 "explicit HDR is unsupported for built-in displays; use Extra Brightness "
-                    + "with 'crispctl brightness boost set <display> on' when eligible"
+                    + "with 'bdctl brightness boost set <display> on' when eligible"
             )
         )
 
@@ -447,7 +447,7 @@ final class CrispControlModelTests: XCTestCase {
         )
         XCTAssertFalse(uncertain.ok)
         XCTAssertTrue(uncertain.error?.contains("outcome is uncertain") == true)
-        XCTAssertTrue(uncertain.error?.contains("crispctl hdr get <display>") == true)
+        XCTAssertTrue(uncertain.error?.contains("bdctl hdr get <display>") == true)
         XCTAssertEqual(CrispControlCLIModel.classify(CrispControlModel.encode(uncertain), for: .setHDR), .serverFailure)
     }
 

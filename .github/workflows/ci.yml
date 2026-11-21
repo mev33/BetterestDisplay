@@ -76,4 +76,4 @@ jobs:
       - name: No-network check (sources and build scripts)
         run: ./scripts/check-no-network.sh
       - name: Build the app bundle
-        run: CRISP_INSTALL=0 ./scripts/build-app.sh
+        run: BD_INSTALL=0 ./scripts/build-app.sh

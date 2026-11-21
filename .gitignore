@@ -12,7 +12,7 @@ Crisp.xcodeproj/
 Crisp.dmg
 .superpowers/
 Crisp-bin
-crispctl-bin
+bdctl-bin
 
 # Working/internal docs kept local-only (research, release-note drafts)
 docs/research/

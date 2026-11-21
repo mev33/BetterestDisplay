@@ -2,7 +2,7 @@
 # Fails if this offline fork could touch the network.
 #
 #   ./scripts/check-no-network.sh                  # scan sources + build scripts (+ ./Crisp-bin,
-#                                                  #   ./crispctl-bin and the installed app if present, on macOS)
+#                                                  #   ./bdctl-bin and the installed app if present, on macOS)
 #   ./scripts/check-no-network.sh --binary PATH    # scan only PATH (a Mach-O file or a .app bundle);
 #                                                  #   repeatable
 #
@@ -13,7 +13,7 @@
 # 3. Binaries (macOS only): undefined symbols from networking APIs (nm -u) and linked
 #    networking frameworks (otool -L).
 #
-# The local crispctl socket is AF_UNIX and allowed; AF_INET/AF_INET6 are not.
+# The local bdctl socket is AF_UNIX and allowed; AF_INET/AF_INET6 are not.
 # Known-harmless hits (a plist DTD identifier, a help message) are listed in
 # scripts/no-network-allowlist.txt as "<path><TAB><literal text on the line>".
 set -euo pipefail
@@ -111,7 +111,7 @@ else
     scan script "$SCRIPT_PATTERN" "${scripts[@]}"
 
     if [ "$(uname -s)" = Darwin ]; then
-        for b in Crisp-bin crispctl-bin "${CRISP_APP:-/Applications/Crisp.app}"; do
+        for b in Crisp-bin bdctl-bin "${BD_APP:-/Applications/BetterestDisplay.app}"; do
             [ -e "$b" ] || continue
             echo "==> No-network check: $b"
             scan_target "$b"

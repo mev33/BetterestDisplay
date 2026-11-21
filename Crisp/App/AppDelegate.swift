@@ -84,7 +84,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         // Prevent duplicate launch via an exclusive file lock. Unlike consulting
         // NSWorkspace (whose entries linger during teardown and race with fast
         // relaunches), flock is released by the kernel the moment a process dies.
-        let lockPath = NSTemporaryDirectory() + "crisp.lock"
+        // Its own name, so an upstream Crisp running alongside never stops this app from launching.
+        let lockPath = NSTemporaryDirectory() + "betterestdisplay.lock"
         let lockFD = open(lockPath, O_CREAT | O_RDWR, 0o600)
         if lockFD == -1 || flock(lockFD, LOCK_EX | LOCK_NB) != 0 {
             exit(0)
@@ -331,7 +332,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         let item = NSStatusBar.system.statusItem(withLength: length)
         // Not "display": that's the native Displays module icon, two identical
         // icons in the menu bar is confusing. Screen-with-sparkles keeps the vibe.
-        let icon = NSImage(systemSymbolName: "sparkles.tv", accessibilityDescription: "Crisp")
+        let icon = NSImage(systemSymbolName: "sparkles.tv", accessibilityDescription: "BetterestDisplay")
         icon?.isTemplate = true
         item.button?.image = icon
         // Action stays wired for accessibility (AXPress); real clicks are

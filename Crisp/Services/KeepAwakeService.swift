@@ -36,7 +36,7 @@ final class KeepAwakeService: ObservableObject {
             let result = IOPMAssertionCreateWithName(
                 kIOPMAssertionTypePreventUserIdleDisplaySleep as CFString,
                 IOPMAssertionLevel(kIOPMAssertionLevelOn),
-                "Crisp Keep Awake" as CFString,
+                "BetterestDisplay Keep Awake" as CFString,
                 &id)
             guard result == kIOReturnSuccess else { return }
             assertionID = id

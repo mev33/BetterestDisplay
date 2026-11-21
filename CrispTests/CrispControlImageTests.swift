@@ -1,7 +1,7 @@
 import XCTest
 
-/// crispctl's Image Adjustment commands: the typed form, the refusals, and the
-/// mapping from crispctl's setting names to the saved adjustment's fields.
+/// bdctl's Image Adjustment commands: the typed form, the refusals, and the
+/// mapping from bdctl's setting names to the saved adjustment's fields.
 final class CrispControlImageTests: XCTestCase {
     private let online = CrispControlDisplay(id: 7, name: "Display", brightness: 50, isBuiltin: false, uuid: "AAA", connected: true)
     private let held = CrispControlDisplay(id: 9, name: "Held", brightness: 0, isBuiltin: false, uuid: "BBB", connected: false)
@@ -21,7 +21,7 @@ final class CrispControlImageTests: XCTestCase {
         for arguments in [["image", "set", "7", "warmth", "10"], ["image", "set", "7", "invert", "1"],
                           ["image", "set", "7", "contrast", "high"], ["image", "set", "7", "contrast"]] {
             XCTAssertEqual(CrispControlCLIModel.parse(arguments: arguments),
-                           .failure("usage: crispctl image set <display> <setting> <value>"), "\(arguments)")
+                           .failure("usage: bdctl image set <display> <setting> <value>"), "\(arguments)")
         }
     }
 
@@ -41,7 +41,7 @@ final class CrispControlImageTests: XCTestCase {
         XCTAssertEqual(try set("BBB", .contrast, 10).response, .failure("display is not connected"))
     }
 
-    /// Each crispctl name must reach its own field, and read back under the same name.
+    /// Each bdctl name must reach its own field, and read back under the same name.
     func testEverySettingMapsToItsOwnField() throws {
         var adjustment = GammaAdjustment()
         let settings = CrispControlImageSetting.allCases.filter { $0 != .invert && $0 != .quantization }

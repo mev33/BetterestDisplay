@@ -1,7 +1,7 @@
-# Crisp (offline personal fork): convenience wrappers around the build scripts.
+# BetterestDisplay (offline personal fork of Crisp): convenience wrappers around the build scripts.
 #
 # This fork never touches the network, at build time or at runtime:
-#   make app        build the full app bundle with swiftc, sign it, install to /Applications/Crisp.app
+#   make app        build the full app bundle with swiftc, sign it, install to /Applications/BetterestDisplay.app
 #   make dev        fast loop: recompile, swap the binary into the installed app, re-sign, relaunch
 #   make compile    compile the binary only (./Crisp-bin), no swap: quick build check
 #   make test       generate the Xcode project and run unit tests
@@ -11,8 +11,8 @@
 #   make clean      remove build artifacts
 #   make help       list targets (default)
 #
-# dev and app honour CRISP_APP (target bundle) and CRISP_SIGN_ID (signing identity), e.g.:
-#   make app CRISP_APP=/path/to/Crisp.app CRISP_SIGN_ID="Crisp Dev"
+# dev and app honour BD_APP (target bundle) and BD_SIGN_ID (signing identity), e.g.:
+#   make app BD_APP=/path/to/BetterestDisplay.app BD_SIGN_ID="BetterestDisplay Dev"
 
 # Single source of truth for the version: project.yml.
 VERSION := $(shell grep -E '^[[:space:]]*MARKETING_VERSION:' project.yml | head -1 | sed -E 's/.*"([^"]+)".*/\1/')
@@ -39,7 +39,7 @@ SWIFTC_FLAGS := -O -swift-version 6 -parse-as-library \
 .PHONY: help app dev compile test lint loc-check typecheck-x86 no-network check clean
 
 help:
-	@echo "Crisp (offline fork): make targets:"
+	@echo "BetterestDisplay (offline fork of Crisp): make targets:"
 	@echo "  make app        build + sign + install the full app bundle (scripts/build-app.sh)"
 	@echo "  make dev        compile + swap into the installed app + relaunch (dev.sh)"
 	@echo "  make compile    compile ./Crisp-bin only, no swap (quick build check)"
@@ -55,7 +55,7 @@ dev:
 	./dev.sh
 
 compile:
-	@echo "==> Compiling Crisp $(VERSION) -> ./Crisp-bin"
+	@echo "==> Compiling BetterestDisplay $(VERSION) -> ./Crisp-bin"
 	swiftc $(SWIFTC_FLAGS) $(SWIFT_SOURCES) -o Crisp-bin
 	@echo "Done. ./Crisp-bin built (not swapped into the app; use 'make dev' for that)."
 
@@ -102,6 +102,6 @@ check: lint test typecheck-x86 loc-check no-network
 	@echo "check passed: lint clean, tests green, x86_64 slice typechecks, localization keys complete, no network code"
 
 clean:
-	rm -f Crisp-bin crispctl-bin
+	rm -f Crisp-bin bdctl-bin
 	rm -rf build
-	@echo "Cleaned: Crisp-bin, crispctl-bin, build/"
+	@echo "Cleaned: Crisp-bin, bdctl-bin, build/"

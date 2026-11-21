@@ -1,10 +1,10 @@
 import AppIntents
 
-// Crisp's actions in the Shortcuts app (#188). Each one sends the request crispctl
+// Crisp's actions in the Shortcuts app (#188). Each one sends the request bdctl
 // would, through CrispControlServer.handle, so the checks, the errors and the
-// serialisation of connection changes are crispctl's. Metadata: scripts/appintents.sh.
+// serialisation of connection changes are bdctl's. Metadata: scripts/appintents.sh.
 
-/// Sends one crispctl request in-process; a refusal becomes the action's error.
+/// Sends one bdctl request in-process; a refusal becomes the action's error.
 @MainActor
 private func send(_ request: CrispControlRequest) async throws -> CrispControlResponse {
     guard let server = CrispControlServer.running else { throw ShortcutsActionError.notReady }
@@ -19,8 +19,8 @@ enum ShortcutsActionError: Error, CustomLocalizedStringResourceConvertible {
 
     var localizedStringResource: LocalizedStringResource {
         switch self {
-        case .notReady: "Crisp is still starting. Try again."
-        case .refused(let reason): "Crisp refused: \(reason)"
+        case .notReady: "BetterestDisplay is still starting. Try again."
+        case .refused(let reason): "BetterestDisplay refused: \(reason)"
         }
     }
 }
@@ -29,7 +29,7 @@ enum ShortcutsActionError: Error, CustomLocalizedStringResourceConvertible {
 
 /// A saved preset as the Shortcuts app lists it.
 struct PresetEntity: AppEntity {
-    static let typeDisplayRepresentation: TypeDisplayRepresentation = "Crisp Preset"
+    static let typeDisplayRepresentation: TypeDisplayRepresentation = "BetterestDisplay Preset"
     static let defaultQuery = PresetQuery()
 
     let id: UUID
@@ -55,7 +55,7 @@ struct PresetQuery: EntityQuery {
 /// A display as the Shortcuts app lists it, by uuid, which survives an unplug or a
 /// wake. Displays Crisp holds disconnected are listed too, so Reconnect can name them.
 struct DisplayEntity: AppEntity {
-    static let typeDisplayRepresentation: TypeDisplayRepresentation = "Crisp Display"
+    static let typeDisplayRepresentation: TypeDisplayRepresentation = "Display (BetterestDisplay)"
     static let defaultQuery = DisplayQuery()
 
     let id: String
@@ -78,7 +78,7 @@ struct DisplayQuery: EntityQuery {
     }
 }
 
-/// The Image Adjustment sliders, named as in the menu. Invert stays in crispctl: a
+/// The Image Adjustment sliders, named as in the menu. Invert stays in bdctl: a
 /// switch does not fit the action's number.
 enum ImageSettingEntity: String, AppEnum {
     case contrast, gamma, gain, temperature
@@ -106,8 +106,8 @@ enum ImageSettingEntity: String, AppEnum {
 
 /// The action behind scheduled presets: a Time of Day automation runs it.
 struct ApplyPresetIntent: AppIntent {
-    static let title: LocalizedStringResource = "Apply Crisp Preset"
-    static let description = IntentDescription("Applies a preset saved in Crisp, the same as clicking it in the menu.")
+    static let title: LocalizedStringResource = "Apply BetterestDisplay Preset"
+    static let description = IntentDescription("Applies a preset saved in BetterestDisplay, the same as clicking it in the menu.")
 
     @Parameter(title: "Preset")
     var preset: PresetEntity
@@ -224,7 +224,7 @@ struct DisconnectDisplayIntent: AppIntent {
 
 struct ReconnectDisplayIntent: AppIntent {
     static let title: LocalizedStringResource = "Reconnect Display"
-    static let description = IntentDescription("Puts a display that Crisp disconnected back in the layout.")
+    static let description = IntentDescription("Puts a display that BetterestDisplay disconnected back in the layout.")
 
     @Parameter(title: "Display")
     var display: DisplayEntity

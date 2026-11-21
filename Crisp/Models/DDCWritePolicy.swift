@@ -2,7 +2,7 @@ import Foundation
 
 /// The only DDC/CI VCP codes this app may ever write (Set VCP Feature). Enforced in
 /// DDCService at the one function every write goes through, so no caller, preset,
-/// Shortcut or crispctl command can send anything else to a monitor.
+/// Shortcut or bdctl command can send anything else to a monitor.
 ///
 /// Not on the list on purpose: 0x04 (restore factory defaults), 0x05 (restore factory
 /// brightness/contrast), 0x06 (restore geometry), 0x08 (restore color), 0x0C (save

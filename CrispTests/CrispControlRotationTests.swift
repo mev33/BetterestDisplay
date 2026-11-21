@@ -1,6 +1,6 @@
 import XCTest
 
-/// crispctl's rotation commands (#258): which displays they reach, and which they refuse.
+/// bdctl's rotation commands (#258): which displays they reach, and which they refuse.
 final class CrispControlRotationTests: XCTestCase {
     private let display = CrispControlDisplay(
         id: 7, name: "Q27G3XMN", brightness: 56, isBuiltin: false, uuid: "37D8832A-2D66-02CA-B9F7-8F30A301B230"
@@ -39,6 +39,6 @@ final class CrispControlRotationTests: XCTestCase {
         XCTAssertEqual(CrispControlCLIModel.parse(arguments: ["display", "rotation", "set", "7", "270"]),
                        .request(.init(command: .setRotation, selector: "7", rotation: 270)))
         XCTAssertEqual(CrispControlCLIModel.parse(arguments: ["display", "rotation", "set", "7", "45"]),
-                       .failure("usage: crispctl display rotation set <display> 0|90|180|270"))
+                       .failure("usage: bdctl display rotation set <display> 0|90|180|270"))
     }
 }

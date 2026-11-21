@@ -322,7 +322,7 @@ class DisplayManager: ObservableObject {
         return false
     }
 
-    /// Turns one display (#258), for the panel's Rotation row and crispctl. Width and height
+    /// Turns one display (#258), for the panel's Rotation row and bdctl. Width and height
     /// swap, so the mode list is read again; the full refresh also moves the remembered-
     /// disconnect baseline to the new rotation. Neither waits on a reconfiguration callback.
     func rotate(_ display: DisplayInfo, to rotation: DisplayRotation) async -> Bool {

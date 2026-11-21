@@ -456,7 +456,7 @@ struct SettingsView: View {
 
             SectionDivider()
 
-            Text("Crisp v\(AppVersion.current)")
+            Text("BetterestDisplay v\(AppVersion.current)")
                 .font(.caption)
                 .foregroundColor(.secondaryReadable)
                 .padding(.horizontal, 12)

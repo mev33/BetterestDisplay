@@ -16,7 +16,7 @@ struct AdvancedAboutTab: View {
                 .resizable()
                 .frame(width: 80, height: 80)
                 .accessibilityHidden(true)
-            Text(verbatim: "Crisp")
+            Text(verbatim: "BetterestDisplay")
                 .font(.title.bold())
                 .padding(.top, 8)
             Text("Version \(AppVersion.current)")
@@ -32,7 +32,7 @@ struct AdvancedAboutTab: View {
             Button(copied ? "Copied" : copying ? "Copying…" : "Copy Debug Info") { copyDebugInfo() }
                 .disabled(copying)
                 .padding(.top, 18)
-            Text("Copies versions, displays and the last 30 minutes of Crisp's log to the clipboard, for a bug report.")
+            Text("Copies versions, displays and the last 30 minutes of BetterestDisplay's log to the clipboard, for a bug report.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .padding(.top, 6)

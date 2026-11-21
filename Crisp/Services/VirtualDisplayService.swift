@@ -111,7 +111,7 @@ final class VirtualDisplayService: ObservableObject, @unchecked Sendable {
         )
         descriptor.maxPixelsWide = UInt32(w)
         descriptor.maxPixelsHigh = UInt32(h)
-        descriptor.name = config.name.isEmpty ? String(localized: "Crisp Virtual") : config.name
+        descriptor.name = config.name.isEmpty ? String(localized: "BetterestDisplay Virtual") : config.name
         descriptor.vendorID = Self.crispVirtualVendorID  // must be non-zero or init returns nil
         // Must be unique per config AND stable across recreations (macOS keys per-display
         // settings, including "what to show", on this identity). Both halves from the config UUID.

@@ -71,18 +71,18 @@
     "%@" : {
       "shouldTranslate" : false
     },
-    "%@ (Crisp)" : {
+    "%@ (BetterestDisplay)" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@（Crisp）"
+            "value" : "%@（BetterestDisplay）"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@（Crisp）"
+            "value" : "%@（BetterestDisplay）"
           }
         }
       }
@@ -477,18 +477,18 @@
         }
       }
     },
-    "Copies versions, displays and the last 30 minutes of Crisp's log to the clipboard, for a bug report." : {
+    "Copies versions, displays and the last 30 minutes of BetterestDisplay's log to the clipboard, for a bug report." : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "将版本、显示器信息和 Crisp 最近 30 分钟的日志拷贝到剪贴板，用于提交问题报告。"
+            "value" : "将版本、显示器信息和 BetterestDisplay 最近 30 分钟的日志拷贝到剪贴板，用于提交问题报告。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "將版本、顯示器資訊和 Crisp 最近 30 分鐘的記錄拷貝到剪貼簿，用於回報問題。"
+            "value" : "將版本、顯示器資訊和 BetterestDisplay 最近 30 分鐘的記錄拷貝到剪貼簿，用於回報問題。"
           }
         }
       }
@@ -525,50 +525,34 @@
         }
       }
     },
-    "Crisp could not read which input this Mac is on. Choose it once in the menu." : {
+    "BetterestDisplay could not read which input this Mac is on. Choose it once in the menu." : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Crisp 无法读取这台 Mac 使用的输入源。请在菜单中选择一次。"
+            "value" : "BetterestDisplay 无法读取这台 Mac 使用的输入源。请在菜单中选择一次。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Crisp 無法讀取這台 Mac 使用的輸入來源。請在選單中選擇一次。"
+            "value" : "BetterestDisplay 無法讀取這台 Mac 使用的輸入來源。請在選單中選擇一次。"
           }
         }
       }
     },
-    "Crisp could not read which input this Mac is on. Choose it once." : {
+    "BetterestDisplay could not read which input this Mac is on. Choose it once." : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Crisp 无法读取这台 Mac 使用的输入源。请选择一次。"
+            "value" : "BetterestDisplay 无法读取这台 Mac 使用的输入源。请选择一次。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Crisp 無法讀取這台 Mac 使用的輸入來源。請選擇一次。"
-          }
-        }
-      }
-    },
-    "Crisp is free. Donations keep it signed and notarized:" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Crisp 完全免费。赞助用于让它保持签名和公证："
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Crisp 完全免費。贊助讓它保持簽署和公證："
+            "value" : "BetterestDisplay 無法讀取這台 Mac 使用的輸入來源。請選擇一次。"
           }
         }
       }
@@ -653,18 +637,18 @@
         }
       }
     },
-    "For brightness keys with the lid closed, or sent as F14 and F15. Crisp acts on those keys only and stores nothing." : {
+    "For brightness keys with the lid closed, or sent as F14 and F15. BetterestDisplay acts on those keys only and stores nothing." : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "用于合盖时的亮度键，或以 F14 和 F15 发送的亮度键。Crisp 只响应这些按键，不存储任何内容。"
+            "value" : "用于合盖时的亮度键，或以 F14 和 F15 发送的亮度键。BetterestDisplay 只响应这些按键，不存储任何内容。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "用於闔上螢幕時的亮度鍵，或以 F14 和 F15 傳送的亮度鍵。Crisp 只回應這些按鍵，不儲存任何內容。"
+            "value" : "用於闔上螢幕時的亮度鍵，或以 F14 和 F15 傳送的亮度鍵。BetterestDisplay 只回應這些按鍵，不儲存任何內容。"
           }
         }
       }
@@ -701,18 +685,18 @@
         }
       }
     },
-    "HiDPI and smooth scaling go back to how they were before Crisp changed them. macOS asks for your administrator password." : {
+    "HiDPI and smooth scaling go back to how they were before BetterestDisplay changed them. macOS asks for your administrator password." : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "HiDPI 和平滑缩放将恢复到 Crisp 更改之前的状态。macOS 会要求输入管理员密码。"
+            "value" : "HiDPI 和平滑缩放将恢复到 BetterestDisplay 更改之前的状态。macOS 会要求输入管理员密码。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "HiDPI 和平滑縮放將還原到 Crisp 更改之前的狀態。macOS 會要求輸入管理員密碼。"
+            "value" : "HiDPI 和平滑縮放將還原到 BetterestDisplay 更改之前的狀態。macOS 會要求輸入管理員密碼。"
           }
         }
       }
@@ -797,18 +781,18 @@
         }
       }
     },
-    "Links crispctl into ~/.local/bin" : {
+    "Links bdctl into ~/.local/bin" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "将 crispctl 链接到 ~/.local/bin"
+            "value" : "将 bdctl 链接到 ~/.local/bin"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "將 crispctl 連結到 ~/.local/bin"
+            "value" : "將 bdctl 連結到 ~/.local/bin"
           }
         }
       }
@@ -941,18 +925,18 @@
         }
       }
     },
-    "Puts back the %lld files in /Library/Displays that Crisp changed, as they were before" : {
+    "Puts back the %lld files in /Library/Displays that BetterestDisplay changed, as they were before" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "将 Crisp 更改过的 %lld 个 /Library/Displays 文件恢复原样"
+            "value" : "将 BetterestDisplay 更改过的 %lld 个 /Library/Displays 文件恢复原样"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "將 Crisp 更改過的 %lld 個 /Library/Displays 檔案還原成原樣"
+            "value" : "將 BetterestDisplay 更改過的 %lld 個 /Library/Displays 檔案還原成原樣"
           }
         }
       }
@@ -1293,18 +1277,18 @@
         }
       }
     },
-    "crispctl and scripts can list and read, but not change anything" : {
+    "bdctl and scripts can list and read, but not change anything" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "crispctl 和脚本只能列出和读取，不能更改任何内容"
+            "value" : "bdctl 和脚本只能列出和读取，不能更改任何内容"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "crispctl 和腳本只能列出和讀取，不能更改任何內容"
+            "value" : "bdctl 和腳本只能列出和讀取，不能更改任何內容"
           }
         }
       }
@@ -1412,18 +1396,18 @@
         }
       }
     },
-    "Applies a preset saved in Crisp, the same as clicking it in the menu." : {
+    "Applies a preset saved in BetterestDisplay, the same as clicking it in the menu." : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "应用在 Crisp 中保存的预设，与在菜单中点按它的效果相同。"
+            "value" : "应用在 BetterestDisplay 中保存的预设，与在菜单中点按它的效果相同。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "套用在 Crisp 中儲存的預設組，與在選單中按一下它的效果相同。"
+            "value" : "套用在 BetterestDisplay 中儲存的預設組，與在選單中按一下它的效果相同。"
           }
         }
       }
@@ -1444,18 +1428,18 @@
         }
       }
     },
-    "Apply Crisp Preset" : {
+    "Apply BetterestDisplay Preset" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "应用 Crisp 预设"
+            "value" : "应用 BetterestDisplay 预设"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "套用 Crisp 預設組"
+            "value" : "套用 BetterestDisplay 預設組"
           }
         }
       }
@@ -2159,85 +2143,85 @@
         }
       }
     },
-    "Crisp Display" : {
+    "Display (BetterestDisplay)" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Crisp 显示器"
+            "value" : "显示器（BetterestDisplay）"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Crisp 顯示器"
+            "value" : "顯示器（BetterestDisplay）"
           }
         }
       }
     },
-    "Crisp is still starting. Try again." : {
+    "BetterestDisplay is still starting. Try again." : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Crisp 仍在启动中，请重试。"
+            "value" : "BetterestDisplay 仍在启动中，请重试。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Crisp 仍在啟動中，請再試一次。"
+            "value" : "BetterestDisplay 仍在啟動中，請再試一次。"
           }
         }
       }
     },
-    "Crisp Preset" : {
+    "BetterestDisplay Preset" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Crisp 预设"
+            "value" : "BetterestDisplay 预设"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Crisp 預設組"
+            "value" : "BetterestDisplay 預設組"
           }
         }
       }
     },
-    "Crisp refused: %@" : {
+    "BetterestDisplay refused: %@" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Crisp 拒绝了请求：%@"
+            "value" : "BetterestDisplay 拒绝了请求：%@"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Crisp 拒絕了要求：%@"
+            "value" : "BetterestDisplay 拒絕了要求：%@"
           }
         }
       }
     },
-    "Crisp v%@" : {
+    "BetterestDisplay v%@" : {
       "shouldTranslate" : false
     },
-    "Crisp Virtual" : {
+    "BetterestDisplay Virtual" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Crisp 虚拟显示器"
+            "value" : "BetterestDisplay 虚拟显示器"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Crisp 虛擬顯示器"
+            "value" : "BetterestDisplay 虛擬顯示器"
           }
         }
       }
@@ -3295,22 +3279,6 @@
         }
       }
     },
-    "Links crispctl into /usr/local/bin" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "将 crispctl 链接到 /usr/local/bin"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "將 crispctl 連結到 /usr/local/bin"
-          }
-        }
-      }
-    },
     "Loading profiles…" : {
       "localizations" : {
         "zh-Hans" : {
@@ -3885,18 +3853,18 @@
         }
       }
     },
-    "Puts a display that Crisp disconnected back in the layout." : {
+    "Puts a display that BetterestDisplay disconnected back in the layout." : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "将 Crisp 断开的显示器放回排列中。"
+            "value" : "将 BetterestDisplay 断开的显示器放回排列中。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "將 Crisp 中斷連線的顯示器放回排列中。"
+            "value" : "將 BetterestDisplay 中斷連線的顯示器放回排列中。"
           }
         }
       }
@@ -3934,18 +3902,18 @@
         }
       }
     },
-    "Quit Crisp" : {
+    "Quit BetterestDisplay" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "退出 Crisp"
+            "value" : "退出 BetterestDisplay"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "結束 Crisp"
+            "value" : "結束 BetterestDisplay"
           }
         }
       }
@@ -4718,23 +4686,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "為所選的聲音輸出按下音量鍵。與亮度鍵一樣需要輔助使用權限。"
-          }
-        }
-      }
-    },
-    "Support Crisp" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "支持 Crisp"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "贊助 Crisp"
           }
         }
       }

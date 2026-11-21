@@ -18,7 +18,7 @@ final class SystemFileManifest: ObservableObject {
 
     private init() {
         let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-        let dir = base.appendingPathComponent("Crisp Offline", isDirectory: true)
+        let dir = base.appendingPathComponent("BetterestDisplay", isDirectory: true)
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         fileURL = dir.appendingPathComponent("system-files.json")
         records = (try? Data(contentsOf: fileURL))

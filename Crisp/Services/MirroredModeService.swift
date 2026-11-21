@@ -245,7 +245,7 @@ final class MirroredModeService: ObservableObject {
         descriptor.maxPixelsHigh = UInt32(nativeH * 2)
         // System UI lists the virtual while mirrored (Control Center, first-run Extend
         // picker); a distinct name reads as a feature, a duplicate "Name (2)" as a glitch.
-        descriptor.name = String(localized: "\(display.name) (Crisp)")
+        descriptor.name = String(localized: "\(display.name) (BetterestDisplay)")
         descriptor.vendorID = VirtualDisplayService.crispVirtualVendorID
         // Stable per monitor; two identical monitors mirroring at once would collide (accepted edge).
         let panelIdentity = display.vendorNumber ^ display.modelNumber

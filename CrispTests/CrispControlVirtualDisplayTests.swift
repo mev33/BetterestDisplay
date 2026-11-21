@@ -1,6 +1,6 @@
 import XCTest
 
-/// The crispctl virtual commands: the menu's list and its Activate/Deactivate switch.
+/// The bdctl virtual commands: the menu's list and its Activate/Deactivate switch.
 final class CrispControlVirtualDisplayTests: XCTestCase {
     private func virtual(_ id: String, _ name: String, active: Bool) -> CrispControlVirtualDisplay {
         CrispControlVirtualDisplay(id: id, name: name, width: 1920, height: 1080, hiDPI: false, active: active)

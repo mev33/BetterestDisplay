@@ -66,7 +66,7 @@ struct InputBodyBlock: View {
             }
 
             if service.macInput[uuid] == nil {
-                Text("Crisp could not read which input this Mac is on. Choose it once.").caption()
+                Text("BetterestDisplay could not read which input this Mac is on. Choose it once.").caption()
             } else if PhysicalDisplayToggleService.shared.wouldLeaveNoActiveDisplay(display.displayID) {
                 Text("This is the only display, so it stays connected while it shows the other input.").caption()
             } else {

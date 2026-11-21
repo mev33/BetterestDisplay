@@ -133,7 +133,7 @@ struct AdvancedGeneralTab: View {
             }
             Section("Automation") {
                 if CrispctlInstaller.isAvailable {
-                    CenteredToggle(title: "Command Line Tool", detail: Text("Links crispctl into ~/.local/bin"), isOn: Binding(
+                    CenteredToggle(title: "Command Line Tool", detail: Text("Links bdctl into ~/.local/bin"), isOn: Binding(
                         get: { cliInstalled },
                         set: { newValue in
                             if newValue { CrispctlInstaller.install() } else { CrispctlInstaller.uninstall() }
@@ -143,14 +143,14 @@ struct AdvancedGeneralTab: View {
                 }
                 // Applies to every local client of the control socket, linked or not.
                 CenteredToggle(title: "Command Line Is Read-Only",
-                               detail: Text("crispctl and scripts can list and read, but not change anything"),
+                               detail: Text("bdctl and scripts can list and read, but not change anything"),
                                isOn: $cliReadOnly)
             }
             // Every file Crisp changed as root, put back as it was (SystemFileManifest).
             if !systemFiles.records.isEmpty {
                 Section("System Files") {
                     CenteredRow(title: "Restore Display Override Files",
-                                detail: Text("Puts back the \(systemFiles.records.count) files in /Library/Displays that Crisp changed, as they were before")) {
+                                detail: Text("Puts back the \(systemFiles.records.count) files in /Library/Displays that BetterestDisplay changed, as they were before")) {
                         Button("Restore…") { confirmRestore = true }
                     }
                     ForEach(restoreFailures, id: \.self) { failure in
@@ -166,7 +166,7 @@ struct AdvancedGeneralTab: View {
             Button("Cancel", role: .cancel) {}
         } message: {
             // swiftlint:disable:next line_length - localized literal, splitting would change its catalog key
-            Text("HiDPI and smooth scaling go back to how they were before Crisp changed them. macOS asks for your administrator password.")
+            Text("HiDPI and smooth scaling go back to how they were before BetterestDisplay changed them. macOS asks for your administrator password.")
         }
         .onAppear {
             cliInstalled = CrispctlInstaller.isInstalled
@@ -237,7 +237,7 @@ struct AdvancedKeyboardTab: View {
                     CenteredToggle(
                         title: "Watch Every Key Press",
                         // swiftlint:disable:next line_length - localized literal, splitting would change its catalog key
-                        detail: Text("For brightness keys with the lid closed, or sent as F14 and F15. Crisp acts on those keys only and stores nothing."),
+                        detail: Text("For brightness keys with the lid closed, or sent as F14 and F15. BetterestDisplay acts on those keys only and stores nothing."),
                         isOn: Binding(get: { watchKeyDown }, set: { newValue in
                             watchKeyDown = newValue
                             BrightnessKeyService.shared.restart()
@@ -668,7 +668,7 @@ private struct AdvancedInputPicker: View {
 
     private var detail: Text {
         if let message { return Text(message).foregroundColor(.red) }
-        if service.macInput[uuid] == nil { return Text("Crisp could not read which input this Mac is on. Choose it once.") }
+        if service.macInput[uuid] == nil { return Text("BetterestDisplay could not read which input this Mac is on. Choose it once.") }
         if PhysicalDisplayToggleService.shared.wouldLeaveNoActiveDisplay(display.displayID) {
             return Text("This is the only display, so it stays connected while it shows the other input.")
         }

@@ -47,7 +47,7 @@ struct GammaAdjustment: Codable, Equatable {
     }
 }
 
-/// crispctl's names for the adjustment (CrispControlImageSetting): clearer on the
+/// bdctl's names for the adjustment (CrispControlImageSetting): clearer on the
 /// command line than the field names, which the saved state already uses.
 extension GammaAdjustment {
     func setting(_ setting: CrispControlImageSetting, to value: Double) -> GammaAdjustment {

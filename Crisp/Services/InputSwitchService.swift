@@ -38,7 +38,7 @@ final class InputSwitchService: ObservableObject {
     // MARK: - Queries
 
     /// The inputs to offer: what the monitor lists, else the standard list. A monitor
-    /// with codes of its own is reached by number through crispctl and Shortcuts.
+    /// with codes of its own is reached by number through bdctl and Shortcuts.
     func options(for display: DisplayInfo) -> [UInt16] {
         listed[display.displayUUID].flatMap { $0.isEmpty ? nil : $0 } ?? DDCInputSource.standard
     }
@@ -83,7 +83,7 @@ final class InputSwitchService: ObservableObject {
         await task.value
     }
 
-    /// The final list and current input, for a caller that answers once (crispctl).
+    /// The final list and current input, for a caller that answers once (bdctl).
     func settle(_ display: DisplayInfo) async {
         await readListIfNeeded(display)
         await refreshInput(display)
@@ -108,7 +108,8 @@ final class InputSwitchService: ObservableObject {
 
         var description: String {
             switch self {
-            case .macInputUnknown: String(localized: "Crisp could not read which input this Mac is on. Choose it once in the menu.")
+            // swiftlint:disable:next line_length - localized literal, splitting would change its catalog key
+            case .macInputUnknown: String(localized: "BetterestDisplay could not read which input this Mac is on. Choose it once in the menu.")
             case .writeFailed: String(localized: "The monitor did not take the input change.")
             }
         }
@@ -140,7 +141,7 @@ final class InputSwitchService: ObservableObject {
         return .success(false)
     }
 
-    /// Reconnect for the user's own Reconnect (row, crispctl, Shortcuts), which also
+    /// Reconnect for the user's own Reconnect (row, bdctl, Shortcuts), which also
     /// switches a monitor that left through an input switch back to this Mac. The
     /// blackout rescue calls PhysicalDisplayToggleService.reconnect directly, so it
     /// never takes a monitor away from the other computer.

@@ -15,7 +15,7 @@ final class DebugReportTests: XCTestCase {
             ],
             log: ["12:00:01.000 [501] display: added 2"], allRuns: true)
         XCTAssertEqual(text, """
-            Crisp 1.7.1
+            BetterestDisplay 1.7.1
             macOS Version 27.0.1 (Build 26A434)
             Mac Mac16,1, Apple M4 Pro
 
@@ -32,6 +32,6 @@ final class DebugReportTests: XCTestCase {
     /// and a log of this run alone says so too.
     func testEmptyLogFromThisRunSaysSo() {
         let text = DebugReport.text(crisp: "1", macOS: "2", mac: "3", displays: [], log: [], allRuns: false)
-        XCTAssertTrue(text.hasSuffix("Log, last 30 minutes of this run of Crisp:\n(no lines)"))
+        XCTAssertTrue(text.hasSuffix("Log, last 30 minutes of this run of BetterestDisplay:\n(no lines)"))
     }
 }

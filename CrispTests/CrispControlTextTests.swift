@@ -1,6 +1,6 @@
 import XCTest
 
-/// What crispctl prints without --json (#227).
+/// What bdctl prints without --json (#227).
 final class CrispControlTextTests: XCTestCase {
     private let builtin = CrispControlDisplay(
         id: 1, name: "Built-in Display", brightness: 62.254, maxBrightness: 160, isBuiltin: true,

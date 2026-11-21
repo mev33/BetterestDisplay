@@ -1,13 +1,14 @@
 # BetterestDisplay
 
-> **This is a personal, offline fork of [Crisp](https://github.com/didriksg/Crisp) (MIT).**
+> **BetterestDisplay is a personal, offline fork of [Crisp](https://github.com/didriksg/Crisp) (MIT).**
 > It never connects to the network: the Sparkle updater and every web link are removed,
-> and `scripts/check-no-network.sh` enforces it in every build. It has its own bundle ID
-> (`local.crisp.offline`) and settings folder, so it doesn't clash with an upstream install.
-> Build it with `make app` ([docs/BUILDING.md](docs/BUILDING.md)). What it may do with
-> administrator rights and monitor hardware, and how to undo it, is in
-> [docs/SAFETY.md](docs/SAFETY.md). The download and install instructions below are
-> upstream's and don't apply to this fork.
+> and `scripts/check-no-network.sh` enforces it in every build. It installs as
+> `BetterestDisplay.app`, with its own bundle ID (`local.betterestdisplay.app`),
+> settings folder and command-line tool (`bdctl`), so it never clashes with an upstream
+> Crisp install. Build it with `make app` ([docs/BUILDING.md](docs/BUILDING.md)). What it
+> may do with administrator rights and monitor hardware, and how to undo it, is in
+> [docs/SAFETY.md](docs/SAFETY.md). Everything below this note is upstream Crisp's README:
+> its download and install instructions, and its `crispctl` command, don't apply here.
 
 <div align="center">
 

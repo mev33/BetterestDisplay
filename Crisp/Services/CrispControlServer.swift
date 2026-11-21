@@ -18,10 +18,10 @@ final class CrispControlServer {
     init(displayManager: DisplayManager) { self.displayManager = displayManager }
 
     /// The server AppDelegate started, for the Shortcuts actions: they send the same
-    /// requests in-process, so they share crispctl's checks, errors and serialisation.
+    /// requests in-process, so they share bdctl's checks, errors and serialisation.
     private(set) static weak var running: CrispControlServer?
 
-    /// One request without the socket, answered by the same path crispctl's are.
+    /// One request without the socket, answered by the same path bdctl's are.
     func handle(_ request: CrispControlRequest) async -> CrispControlResponse {
         guard let data = try? JSONEncoder().encode(request) else { return .failure("invalid request") }
         let reply = await response(to: data)
@@ -352,7 +352,7 @@ final class CrispControlServer {
         }
     }
 
-    private static let noDDC = "this display does not answer DDC, so Crisp cannot read or switch its input"
+    private static let noDDC = "this display does not answer DDC, so BetterestDisplay cannot read or switch its input"
 
     private static func listed(_ preset: DisplayPreset) -> CrispControlPreset {
         CrispControlPreset(

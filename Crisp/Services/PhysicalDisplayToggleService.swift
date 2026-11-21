@@ -637,7 +637,7 @@ final class PhysicalDisplayToggleService: ObservableObject {
                                               height: Double(h) / ppi * 25.4)
         descriptor.maxPixelsWide = UInt32(w)
         descriptor.maxPixelsHigh = UInt32(h)
-        descriptor.name = "Crisp Blink Guard"
+        descriptor.name = "BetterestDisplay Blink Guard"
         descriptor.vendorID = VirtualDisplayService.crispVirtualVendorID
         descriptor.productID = 0xB11C
         descriptor.serialNum = 0xB11C

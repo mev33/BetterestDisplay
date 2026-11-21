@@ -266,7 +266,7 @@ struct PanelFooterBlock: View {
         VStack(spacing: 0) {
             Divider().opacity(0.25).padding(.horizontal, 12)
             HStack {
-                Text("Quit Crisp")
+                Text("Quit BetterestDisplay")
                     .font(.body)
                 Spacer()
             }

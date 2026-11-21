@@ -124,7 +124,7 @@ struct ImageAdjustmentView: View {
             // Re-apply so the display matches the UI; no-ops while paused.
             if expanded && !current.isNeutral { GammaService.shared.apply(current, for: display.displayID) }
         }
-        // A preset or crispctl may change the adjustment while this view holds the old values.
+        // A preset or bdctl may change the adjustment while this view holds the old values.
         .onReceive(NotificationCenter.default.publisher(for: .crispGammaAdjustmentDidChange)) { note in
             guard note.object as? String == display.displayUUID else { return }
             show(GammaService.shared.loadSavedState(for: display) ?? GammaAdjustment())

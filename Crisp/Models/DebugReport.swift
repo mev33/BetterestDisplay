@@ -16,7 +16,7 @@ enum DebugReport {
     /// the full log store), so the heading says so.
     static func text(crisp: String, macOS: String, mac: String, displays: [Display],
                      log: [String], allRuns: Bool) -> String {
-        var lines = ["Crisp \(crisp)", "macOS \(macOS)", "Mac \(mac)", "", "Displays:"]
+        var lines = ["BetterestDisplay \(crisp)", "macOS \(macOS)", "Mac \(mac)", "", "Displays:"]
         for display in displays {
             var kind = [display.isBuiltin ? "built-in" : "external"]
             if display.isMain { kind.append("main") }
@@ -25,7 +25,7 @@ enum DebugReport {
             if let mode = display.mode { line += ", \(mode)" }
             lines.append(line)
         }
-        lines += ["", allRuns ? "Log, last 30 minutes:" : "Log, last 30 minutes of this run of Crisp:"]
+        lines += ["", allRuns ? "Log, last 30 minutes:" : "Log, last 30 minutes of this run of BetterestDisplay:"]
         lines += log.isEmpty ? ["(no lines)"] : log
         return lines.joined(separator: "\n")
     }

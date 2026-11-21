@@ -1,6 +1,6 @@
 name: Crisp
 options:
-  bundleIdPrefix: local.crisp
+  bundleIdPrefix: local.betterestdisplay
   deploymentTarget:
     macOS: "14.0"
   developmentLanguage: en
@@ -21,24 +21,29 @@ targets:
           - "**/*.md"
     settings:
       base:
-        # Distinct from upstream Crisp (com.crisp.app), so this fork has its own
-        # settings, Accessibility grant and login item, and never overwrites an
-        # upstream install. scripts/build-app.sh and dev.sh read it from here.
-        PRODUCT_BUNDLE_IDENTIFIER: local.crisp.offline
+        # BetterestDisplay: distinct from upstream Crisp (com.crisp.app), so this fork
+        # has its own settings, Accessibility grant and login item, and never
+        # overwrites an upstream install. scripts/build-app.sh and dev.sh read it here.
+        PRODUCT_BUNDLE_IDENTIFIER: local.betterestdisplay.app
+        # The app is BetterestDisplay.app with a BetterestDisplay executable. The Swift
+        # module keeps upstream's name, so code and tests stay as upstream wrote them.
+        PRODUCT_NAME: BetterestDisplay
+        PRODUCT_MODULE_NAME: Crisp
+        INFOPLIST_KEY_CFBundleDisplayName: BetterestDisplay
         # Without an explicit MARKETING_VERSION the generated Info.plist omits
         # CFBundleShortVersionString and the app self-reports 1.0.0 forever.
         MARKETING_VERSION: "1.7.1"
         CURRENT_PROJECT_VERSION: "5"
         INFOPLIST_KEY_LSUIElement: true
-        INFOPLIST_KEY_NSHumanReadableCopyright: "Crisp - Free & Open Source"
-        INFOPLIST_KEY_NSAppleEventsUsageDescription: "Crisp uses System Events to switch Dark Mode with the system's animated transition."
+        INFOPLIST_KEY_NSHumanReadableCopyright: "BetterestDisplay - an offline fork of Crisp, free & open source"
+        INFOPLIST_KEY_NSAppleEventsUsageDescription: "BetterestDisplay uses System Events to switch Dark Mode with the system's animated transition."
         SWIFT_VERSION: "6.0"
         CODE_SIGN_ENTITLEMENTS: Crisp/Crisp.entitlements
         ENABLE_HARDENED_RUNTIME: YES
         CODE_SIGNING_REQUIRED: YES
         # "Sign to Run Locally": an Xcode build needs no Apple ID (that would sign
         # in to Apple over the network). The everyday build, make app / make dev,
-        # signs with the stable self-signed "Crisp Dev" identity (docs/BUILDING.md).
+        # signs with the stable self-signed "BetterestDisplay Dev" identity (docs/BUILDING.md).
         CODE_SIGN_STYLE: Manual
         CODE_SIGN_IDENTITY: "-"
         SWIFT_OBJC_BRIDGING_HEADER: Crisp/Crisp-Bridging-Header.h
@@ -49,17 +54,17 @@ targets:
         OTHER_LDFLAGS: "-Wl,-U,_SLSConfigureDisplayEnabled -Wl,-U,_SLSGetDisplayList -Wl,-U,_SLSSetDisplayRotation"
         GENERATE_INFOPLIST_FILE: YES
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
-  crispctl:
+  bdctl:
     type: tool
     platform: macOS
     deploymentTarget: "14.0"
     sources:
-      - path: Sources/crispctl
+      - path: Sources/bdctl
       - path: Crisp/Models/CrispControlModel.swift
       - path: Crisp/Models/BrightnessKeySteps.swift
     settings:
       base:
-        PRODUCT_NAME: crispctl
+        PRODUCT_NAME: bdctl
         SWIFT_VERSION: "6.0"
   CrispTests:
     type: bundle.unit-test
@@ -100,7 +105,7 @@ targets:
       - path: Crisp/Models/DDCWriteBudget.swift
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: local.crisp.offline.tests
+        PRODUCT_BUNDLE_IDENTIFIER: local.betterestdisplay.tests
         GENERATE_INFOPLIST_FILE: YES
         SWIFT_VERSION: "6.0"
         TEST_HOST: ""
@@ -111,11 +116,11 @@ schemes:
     build:
       targets:
         Crisp: all
-        crispctl: all
+        bdctl: all
     test:
       targets:
         - CrispTests
-  crispctl:
+  bdctl:
     build:
       targets:
-        crispctl: all
+        bdctl: all

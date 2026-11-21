@@ -22,7 +22,7 @@ final class SettingsService: ObservableObject, @unchecked Sendable {
         let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
         // Not "Crisp": this fork keeps its own folder, so it never shares files with
         // an upstream Crisp install (it has its own bundle ID, and so its own defaults).
-        let dir = base.appendingPathComponent("Crisp Offline", isDirectory: true)
+        let dir = base.appendingPathComponent("BetterestDisplay", isDirectory: true)
         // One-time migration from the pre-rename storage folder.
         let legacy = base.appendingPathComponent("FreeDisplay", isDirectory: true)
         if !FileManager.default.fileExists(atPath: dir.path),

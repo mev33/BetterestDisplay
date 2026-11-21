@@ -15,7 +15,7 @@ private func connectToCrisp(receiveTimeoutSeconds: Int) throws -> Int32 {
     var info = stat()
     guard lstat(path, &info) == 0,
           info.st_uid == geteuid(), info.st_mode & S_IFMT == S_IFSOCK else {
-        throw ClientFailure(message: "Crisp control socket is unavailable or untrusted")
+        throw ClientFailure(message: "BetterestDisplay control socket is unavailable or untrusted")
     }
     let client = Darwin.socket(AF_UNIX, SOCK_STREAM, 0)
     guard client >= 0 else { throw systemFailure("creation") }
@@ -96,14 +96,14 @@ private func fail(_ message: String, code: Int32) -> Never {
     FileHandle.standardError.write(jsonOutput ? CrispControlModel.encode(.failure(message)) : Data("error: \(message)\n".utf8))
     Darwin.exit(code)
 }
-/// The version of the Crisp this tool ships inside: crispctl lives at
-/// Crisp.app/Contents/MacOS/crispctl, so the app's Info.plist is two levels up from
+/// The version of the BetterestDisplay this tool ships inside: bdctl lives at
+/// BetterestDisplay.app/Contents/MacOS/bdctl, so the app's Info.plist is two levels up from
 /// the executable once the ~/.local/bin link is resolved.
 private func bundledVersion() -> String {
     guard let executable = Bundle.main.executableURL?.resolvingSymlinksInPath() else { return "unknown" }
     let plist = executable.deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("Info.plist")
     guard let info = NSDictionary(contentsOf: plist), let version = info["CFBundleShortVersionString"] as? String else {
-        return "unknown (not inside Crisp.app)"
+        return "unknown (not inside BetterestDisplay.app)"
     }
     return version
 }
@@ -118,7 +118,7 @@ case let .help(topic):
     }
     Darwin.exit(EXIT_SUCCESS)
 case .version:
-    print("crispctl \(bundledVersion())")
+    print("bdctl \(bundledVersion())")
     Darwin.exit(EXIT_SUCCESS)
 case let .failure(message): fail(message, code: 2)
 }
