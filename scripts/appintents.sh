@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # Sourced by dev.sh and scripts/build-app.sh (both export BD_BUNDLE_ID). Shortcuts finds the app's actions
 # (Crisp/App/ShortcutsActions.swift) through Contents/Resources/Metadata.appintents,
 # which an Xcode build writes with appintentsmetadataprocessor. Crisp builds with

@@ -960,7 +960,7 @@ enum CrispControlCLIModel {
     ]
     static let otherRows: [(usage: String, arguments: String, summary: String)] = [
         ("help", "", "Show this help (also -h, --help)"),
-        ("version", "", "Show the BetterestDisplay version this tool ships with (also --version)")
+        ("version", "", "Show the BetterestDisplay version (also --version)")
     ]
 
     static let intro = """
