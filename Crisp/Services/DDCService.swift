@@ -500,10 +500,7 @@ final class DDCService: ObservableObject, @unchecked Sendable {
     private func writeSynchronous(displayID: CGDirectDisplayID, command: UInt8, value: UInt16) -> Bool {
         // Every VCP Set passes here: anything off the allowlist (a factory reset, a
         // settings save, a manufacturer code) is refused before it reaches the bus.
-        guard DDCWritePolicy.allows(command) else {
-            Self.log.error("refused write \(Self.hex(command), privacy: .public) display \(displayID, privacy: .public): VCP code not on the allowlist")
-            return false
-        }
+        guard DDCWritePolicy.allows(command) else { return refuseWrite(command, displayID: displayID) }
         let start = DispatchTime.now()
         defer {
             let ms = Self.millisSince(start)
@@ -960,5 +957,17 @@ final class DDCService: ObservableObject, @unchecked Sendable {
                 continuation.resume(returning: result)
             }
         }
+    }
+}
+
+// MARK: - Write allowlist
+
+// In an extension, so the allowlist adds no lines to DDCService's body (SwiftLint's
+// type_body_length cap). Same file, so it can use the class's private log and hex.
+extension DDCService {
+    /// Logs a write refused by DDCWritePolicy, and returns the write's result: false.
+    fileprivate func refuseWrite(_ command: UInt8, displayID: CGDirectDisplayID) -> Bool {
+        Self.log.error("refused write \(Self.hex(command), privacy: .public) display \(displayID, privacy: .public): VCP code not on the allowlist")
+        return false
     }
 }
