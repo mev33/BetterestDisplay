@@ -14,6 +14,93 @@ You want to stop depending on BetterDisplay, which is closed source. Its key fea
   - **C. XDR boost, EDID and display connection.**
   - **D. Color, connection modes, refresh rate and HDR.** This is your "colorspace picking, HDR/SDR bitrate, refresh mode, forced HDR, etc." I've read "bitrate" as **bit depth** (8, 10 or 12-bit, for SDR and HDR). Link bandwidth also appears in the diagnostics view (C8).
 
+### Status (Nov 21)
+- **Phase 0 is written and committed** as `601c2c4` on branch `offline-fork` in `/home/user/crisp`, on top of upstream commit `8fb8e8d`. It covers de-networking, `check-no-network.sh`, `build-app.sh`, the fork identity, and safety fixes S1–S6 and S10, plus `docs/SAFETY.md` and `docs/PLAN.md`.
+- **It has not been compiled.** This container has no Swift toolchain, and your Mac isn't connected.
+- **The only copy outside this container** is the `crisp-offline-fork.bundle` you downloaded.
+- **Why nothing was pushed:** the branch's only remote is upstream `didriksg/Crisp`, which isn't yours, and this session's GitHub CLI token is invalid. So the next step is to push to a private repo of your own.
+
+### Status (Nov 22)
+- **`main` on `mev33/BetterestDisplay` is at `794a7d8`.** It contains Phase 0, the rename to BetterestDisplay with the `bdctl` CLI, and the bug-test fixes.
+- **Tested so far, on Linux:**
+  - The model files and their 80 unit tests build with Swift 6.4.3, warnings as errors, and pass.
+  - Strict SwiftLint 0.65.1 is clean on the whole repo.
+  - shellcheck is clean.
+- **Never compiled on macOS yet.**
+- **You chose to wait for your Mac** before completing phases 1–10 ("Complete planned phases and check for bugs").
+
+## Completing phases 1–10 on your Mac
+
+### Step 0: connect your Mac (you)
+1. On the Mac:
+   1. `git clone https://github.com/mev33/BetterestDisplay.git`, then `git remote add upstream https://github.com/didriksg/Crisp.git`.
+   2. Install Xcode 26 or later, and run `brew install xcodegen swiftlint`.
+   3. Create the **"BetterestDisplay Dev"** code-signing certificate in Keychain Access (docs/BUILDING.md).
+2. Share the clone with this session: in the Claude desktop app, open **Settings → Claude Code → Remote Control** and add the `BetterestDisplay` folder.
+   - **If the folder doesn't appear here:** using a folder from a cloud session isn't available to every account yet. Then open a Claude Code session on the Mac itself (the desktop app, in that folder) and continue the work there. This plan and `docs/PLAN.md` carry over.
+3. Tell me it's connected. I list the shared folders and request yours, and you approve the prompt.
+
+### Per-phase loop (me, on your Mac)
+For each phase, in order:
+1. **Implement**, following §5 conventions.
+   - New code goes in new files.
+   - Pure logic goes in `Crisp/Models/` with XCTest coverage.
+   - Every hidden-API call is feature-gated.
+   - The safety rules in §4 come first.
+2. **Bug-check**, before anything runs on hardware:
+   - `make check` must be green. It runs SwiftLint `--strict`, XCTest, the x86_64 typecheck, localization keys and `check-no-network.sh`.
+   - A review pass over the phase's diff for correctness bugs.
+   - The relevant §7 safety drills.
+3. **Run on your displays** with `make app` or `make dev`. The rows of the §1 matrix for that phase are checked and logged in `docs/feature-checklist.md`. Anything that needs you to look at a screen or the monitor's info menu, I ask you.
+4. **Commit and push** to `main` on `mev33/BetterestDisplay`, one commit per phase or sub-feature.
+
+### Order and gates
+1. **First build:** the first `make check` and `make app` on macOS. Fix whatever doesn't compile in Phase 0 and the rename, then smoke-test the existing features.
+2. **Phase 1** produces `Spikes/REPORT.md`.
+3. **Phases 2, 3, 4, 6, 7 and 9:** their non-gated parts go in order.
+4. **Gated parts:** each follows its spike result. If a spike fails, that feature is marked "deferred" in the matrix with the reason, rather than shipped half-working.
+   - Phase 5: the connection-mode encoding, depth and range pickers.
+   - Phase 8: EDID override.
+   - Range control (D3), built-in HDR and XDR presets (D9, D10), ProMotion (D6), HDMI-CEC (B22) and built-in HiDPI (A3).
+5. **Phase 10** covers presets, `bdctl` and Shortcuts for everything that shipped.
+
+### Blocked: this session can't reach `mev33/BetterestDisplay` yet (Nov 21) — resolved: pushed Nov 21
+Attaching the repo failed. GitHub reports that this session's credential has no access to `mev33/BetterestDisplay`. Usually that means the Claude GitHub App isn't installed on the repo, or your GitHub account isn't connected. There are two ways forward:
+
+- **A. Give this session access, then I push.**
+  1. Go to **https://claude.ai/connect-github**.
+  2. Connect (or reconnect) your GitHub account, and install the Claude GitHub App on `mev33/BetterestDisplay`. "Only select repositories" is fine, as long as it's included.
+  3. Tell me it's done. I retry the attach once, then run the steps below.
+  4. If the attach still fails, start a new session with the repo selected, and push from there using the bundle.
+- **B. Push it yourself from your Mac, using the bundle you already downloaded** (needs no access from this session):
+  1. `git clone https://github.com/didriksg/Crisp.git BetterestDisplay && cd BetterestDisplay`
+  2. `git fetch ~/Downloads/crisp-offline-fork.bundle offline-fork:offline-fork && git checkout offline-fork`
+  3. `git remote rename origin upstream`
+  4. `git remote add origin https://github.com/mev33/BetterestDisplay.git`
+  5. `git push -u origin offline-fork`
+  6. `git push origin offline-fork:main`
+
+**Update:** you said access is fixed ("Try now?"). An unauthenticated read (`git ls-remote`) still can't see the private repo, which is expected until it's attached. Once you approve, I retry the attach **once**.
+- **If it succeeds:** I run the steps below.
+- **If GitHub still refuses:** I pass on its exact reason and stop. Option B, or a new session started with the repo selected, is then the way.
+
+### Next step (option A): push the fork to `mev33/BetterestDisplay`
+Your private repo is **https://github.com/mev33/BetterestDisplay**. In `/home/user/crisp`:
+1. Call `add_repo(owner: "mev33", repo: "BetterestDisplay", access: "push")` to attach it with credentials.
+2. `git ls-remote https://github.com/mev33/BetterestDisplay.git` should list no branches.
+   - **If it already has commits** (for example a README GitHub added), stop and ask. Don't force-push over them.
+3. `git remote rename origin upstream`, so upstream Crisp stays fetchable for the monthly rebase.
+4. `git remote add origin https://github.com/mev33/BetterestDisplay.git`.
+5. `git push -u origin offline-fork`, retrying network errors up to 4 times with backoff (2 s, 4 s, 8 s, 16 s).
+6. `git push origin offline-fork:main`, so the repo's default branch carries the fork.
+7. **Check:**
+   - `git ls-remote origin` lists `refs/heads/main` and `refs/heads/offline-fork` at `601c2c4`.
+   - `git status -sb` shows `offline-fork...origin/offline-fork` with nothing ahead.
+
+Nothing is pushed to `didriksg/Crisp`, and no pull request is opened there.
+
+The app is still named Crisp inside the code, with bundle ID `local.crisp.offline`. Renaming it to BetterestDisplay is a separate change, made only if you ask for it.
+
 §1 maps every BetterDisplay feature in these categories to one of three statuses: **Have** (Crisp already does it; checked in Phase 1), **New** or **Extend** (with a phase number), or **Excluded** (with a reason). The matrix also serves as the acceptance checklist.
 
 ---
